@@ -3,10 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>FastStile PRO — Elite Finance</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#020617">
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -22,38 +19,36 @@
                 <span class="logo-icon">💎</span>
                 <h1>FastStile <span>PRO</span></h1>
             </div>
-            <button class="btn-circle" onclick="toggleTheme()">🌓</button>
+            <button class="btn-circle" onclick="window.toggleTheme()">🌓</button>
         </div>
     </header>
 
     <main class="dashboard">
         <section class="summary-grid">
-            <div class="status-card balance"><small>Patrimônio Líquido</small><h2 id="resumoSaldo">R$ 0,00</h2></div>
+            <div class="status-card balance"><small>Património Líquido</small><h2 id="resumoSaldo">R$ 0,00</h2></div>
             <div class="status-card income"><small>Receitas</small><h3 id="resumoRenda">R$ 0,00</h3></div>
             <div class="status-card expenses"><small>Despesas</small><h3 id="resumoDespesa">R$ 0,00</h3></div>
         </section>
 
         <div class="main-grid">
-            <section class="glass-card action-panel">
+            <section class="glass-card">
                 <h2>📝 Nova Transação</h2>
-                <div class="input-container">
-                    <input type="text" id="nomeDesc" placeholder="Descrição (ex: Netflix)" autocomplete="off">
-                    <input type="number" id="valorMontante" placeholder="Valor R$" step="0.01">
-                    <select id="categoriaSelect">
-                        <option value="moradia">🏠 Moradia</option>
-                        <option value="transporte">🚗 Transporte</option>
-                        <option value="saude">🏥 Saúde</option>
-                        <option value="educacao">🎓 Educação</option>
-                        <option value="compras">🛍️ Compras</option>
-                        <option value="assinaturas">📺 Assinaturas</option>
-                        <option value="investimentos">📈 Investimentos</option>
-                        <option value="impostos">🏛️ Impostos</option>
-                        <option value="outros">📦 Outros</option>
-                    </select>
-                </div>
+                <input type="text" id="nomeDesc" placeholder="Descrição">
+                <input type="number" id="valorMontante" placeholder="Valor R$">
+                <select id="categoriaSelect">
+                    <option value="moradia">🏠 Moradia</option>
+                    <option value="transporte">🚗 Transporte</option>
+                    <option value="saude">🏥 Saúde</option>
+                    <option value="educacao">🎓 Educação</option>
+                    <option value="compras">🛍️ Compras</option>
+                    <option value="assinaturas">📺 Assinaturas</option>
+                    <option value="investimentos">📈 Investimentos</option>
+                    <option value="impostos">🏛️ Impostos</option>
+                    <option value="outros">📦 Outros</option>
+                </select>
                 <div class="button-group">
-                    <button onclick="adicionar('renda')" class="btn-elite btn-income">Receita +</button>
-                    <button onclick="adicionar('despesa')" class="btn-elite btn-expense">Despesa —</button>
+                    <button onclick="window.adicionar('renda')" class="btn-elite btn-income">Receita +</button>
+                    <button onclick="window.adicionar('despesa')" class="btn-elite btn-expense">Despesa —</button>
                 </div>
             </section>
 
@@ -64,15 +59,11 @@
                 </section>
 
                 <section class="glass-card history-panel">
-                    <h2>🕒 Atividade Recente</h2>
+                    <h2>🕒 Atividade</h2>
                     <div id="listaHistorico" class="custom-scroll"></div>
                     <div class="actions-grid">
-                        <button onclick="exportarPDF()" class="btn-elite btn-pdf">📄 Gerar Relatório Executivo</button>
-                        <div class="sub-actions">
-                            <button onclick="exportarBackup()" class="btn-elite btn-sec">💾 Backup</button>
-                            <button onclick="importarBackup()" class="btn-elite btn-sec">📥 Importar</button>
-                        </div>
-                        <button onclick="zerarDados()" class="btn-elite btn-danger">⚠️ Resetar Banco de Dados</button>
+                        <button onclick="window.exportarPDF()" class="btn-elite btn-pdf">📄 Gerar PDF Elite</button>
+                        <button onclick="window.zerarDados()" class="btn-elite btn-danger">⚠️ Limpar Tudo</button>
                     </div>
                 </section>
             </div>
