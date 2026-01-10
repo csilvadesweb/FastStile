@@ -1,0 +1,25 @@
+{
+  "short_name": "FastStile",
+  "name": "FastStile Elite Finance",
+  "description": "Gestão financeira de alta performance com design Glassmorphism.",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/10041/10041491.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/10041/10041491.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/FastStile/",
+  "display": "standalone",
+  "theme_color": "#020617",
+  "background_color": "#020617",
+  "orientation": "portrait",
+  "scope": "/FastStile/"
+}
