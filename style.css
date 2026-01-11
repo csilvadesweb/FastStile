@@ -1,70 +1,25 @@
-:root {
-  --primary: #0f172a;
-  --accent: #10b981;
-  --danger: #ef4444;
-  --bg: #f8fafc;
-  --card: #ffffff;
-  --text-main: #1e293b;
-  --text-sub: #64748b;
-}
-
-* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
-
-body { background: var(--bg); color: var(--text-main); line-height: 1.4; }
-
-header {
-  background: var(--primary);
-  color: white;
-  padding: 40px 20px;
-  text-align: center;
-  border-bottom-left-radius: 30px;
-  border-bottom-right-radius: 30px;
-}
-
-.badge { background: rgba(16, 185, 129, 0.15); color: var(--accent); padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; }
-
+:root { --primary: #0f172a; --accent: #10b981; --danger: #ef4444; --bg: #f8fafc; }
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; -webkit-tap-highlight-color: transparent; }
+body { background: var(--bg); color: #1e293b; user-select: none; }
+header { background: var(--primary); color: white; padding: 40px 20px; text-align: center; border-bottom-left-radius: 30px; border-bottom-right-radius: 30px; }
+.badge { background: rgba(16, 185, 129, 0.2); color: var(--accent); padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; }
 main { padding: 20px; max-width: 500px; margin: -50px auto 0; }
-
-.insight-card {
-  background: white; padding: 18px; border-radius: 18px; margin-bottom: 20px;
-  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); border-left: 5px solid var(--accent);
-}
-
+.insight-card { background: white; padding: 18px; border-radius: 18px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-left: 5px solid var(--accent); }
 .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 25px; }
-.card { background: var(--card); padding: 15px 5px; border-radius: 18px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.04); }
-.card h3 { font-size: 11px; color: var(--text-sub); text-transform: uppercase; margin-bottom: 4px; }
-.card p { font-weight: 800; font-size: 14px; }
-
-.income { color: var(--accent); }
-.expense { color: var(--danger); }
-.balance { color: var(--primary); }
-
-.form-section { background: white; padding: 22px; border-radius: 22px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.05); margin-bottom: 25px; }
+.card { background: white; padding: 15px 5px; border-radius: 18px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.04); }
+.card h3 { font-size: 10px; color: #64748b; text-transform: uppercase; }
+.form-section { background: white; padding: 22px; border-radius: 22px; box-shadow: 0 10px 15px rgba(0,0,0,0.05); margin-bottom: 25px; }
 .input-group { display: flex; gap: 10px; margin-bottom: 12px; }
-
-input, select { background: #f1f5f9; border: 1px solid #e2e8f0; padding: 14px; border-radius: 14px; width: 100%; font-size: 16px; transition: 0.2s; }
-input:focus { border-color: var(--accent); outline: none; background: white; }
-
-button { padding: 14px; border-radius: 14px; border: none; font-weight: 700; cursor: pointer; transition: 0.2s; font-size: 14px; }
-.btn-main { background: var(--primary); color: white; width: 100%; box-shadow: 0 4px 6px rgba(15, 23, 42, 0.2); }
-.btn-main:active { transform: scale(0.96); }
-
-.list-section h2 { font-size: 18px; margin-bottom: 15px; }
-.list-section li { background: white; padding: 16px; border-radius: 14px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-
-.chart-section { background: white; padding: 25px; border-radius: 22px; margin-bottom: 25px; text-align: center; }
-
-.actions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-.actions button { background: #e2e8f0; color: var(--primary); padding: 10px; font-size: 11px; }
+input, select { background: #f1f5f9; border: 1px solid #e2e8f0; padding: 14px; border-radius: 14px; width: 100%; font-size: 16px; }
+button { padding: 14px; border-radius: 14px; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; }
+.btn-main { background: var(--primary); color: white; width: 100%; }
+.list-section li { background: white; padding: 16px; border-radius: 14px; margin-bottom: 10px; display: flex; justify-content: space-between; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+.chart-section { background: white; padding: 25px; border-radius: 22px; margin-bottom: 25px; }
+.actions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.actions button { background: #e2e8f0; font-size: 10px; }
 button.danger { background: #fee2e2; color: var(--danger); }
-
-footer { text-align: center; margin-top: 40px; color: var(--text-sub); font-size: 12px; padding-bottom: 20px; }
-footer a { color: var(--accent); text-decoration: none; font-weight: bold; }
-
-#toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--primary); color: white; padding: 14px 28px; border-radius: 50px; opacity: 0; pointer-events: none; transition: 0.4s; z-index: 999; }
+footer { text-align: center; margin-top: 40px; color: #64748b; font-size: 12px; padding-bottom: 20px; }
+#toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--primary); color: white; padding: 12px 25px; border-radius: 50px; opacity: 0; transition: 0.4s; }
 .show#toast { opacity: 1; }
-
-.modal { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.8); align-items: center; justify-content: center; z-index: 1000; padding: 20px; backdrop-filter: blur(4px); }
-.modal-content { background: white; padding: 30px; border-radius: 28px; width: 100%; max-width: 400px; text-align: center; }
-.privacy-text { text-align: left; margin: 20px 0; font-size: 14px; color: var(--text-sub); }
-.privacy-text strong { color: var(--primary); display: block; margin-top: 10px; }
+.modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+.modal-content { background: white; padding: 30px; border-radius: 25px; width: 100%; max-width: 400px; text-align: center; }
