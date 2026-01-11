@@ -1,39 +1,58 @@
 const App = (() => {
     "use strict";
-    
+
     const aplicarTema = (tema) => {
-        document.documentElement.setAttribute('data-theme', tema);
-        localStorage.setItem('faststile_theme', tema);
+        document.documentElement.setAttribute("data-theme", tema);
+        localStorage.setItem("faststile_theme", tema);
     };
 
     const init = () => {
-        // Bloqueio de Teclas
-        document.addEventListener('keydown', (e) => {
-            if (e.ctrlKey && (e.key === 'u' || e.key === 's' || e.key === 'i')) e.preventDefault();
+
+        // 🔒 Bloqueios básicos
+        document.addEventListener("keydown", (e) => {
+            if (e.ctrlKey && ["u", "s", "i"].includes(e.key.toLowerCase())) {
+                e.preventDefault();
+            }
         });
 
-        // Tema Inicial
-        const temaSalvo = localStorage.getItem('faststile_theme') || 
-            (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        // 🎨 Tema inicial
+        const temaSalvo =
+            localStorage.getItem("faststile_theme") ||
+            (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+
         aplicarTema(temaSalvo);
 
-        // Service Worker
+        // ⚙️ Service Worker (inalterado)
         if ("serviceWorker" in navigator) {
             navigator.serviceWorker.register("./sw.js").catch(() => {});
         }
 
-        // Privacidade
-        window.addEventListener('load', () => {
-            if (!localStorage.getItem('p_acc')) document.getElementById("modalPrivacidade").style.display = "flex";
+        // 🔐 Controle de Privacidade
+        window.addEventListener("load", () => {
+            if (!localStorage.getItem("p_acc")) {
+                const modal = document.getElementById("modalPrivacidade");
+                if (modal) modal.style.display = "flex";
+            }
         });
+
+        // ✅ Aceitar Privacidade (CORREÇÃO DEFINITIVA)
+        const btnAceitar = document.getElementById("btnAceitarPrivacidade");
+        if (btnAceitar) {
+            btnAceitar.addEventListener("click", () => {
+                localStorage.setItem("p_acc", "1");
+                const modal = document.getElementById("modalPrivacidade");
+                if (modal) modal.style.display = "none";
+            });
+        }
     };
 
     window.toggleTheme = () => {
-        const novo = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-        aplicarTema(novo);
-        location.reload(); // Recarrega para ajustar cores do gráfico
+        const atual = document.documentElement.getAttribute("data-theme");
+        aplicarTema(atual === "dark" ? "light" : "dark");
+        location.reload();
     };
 
     return { start: init };
 })();
-document.addEventListener('DOMContentLoaded', App.start);
+
+document.addEventListener("DOMContentLoaded", App.start);
