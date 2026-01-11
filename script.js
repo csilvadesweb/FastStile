@@ -2,47 +2,71 @@
   "use strict";
 
   const STORAGE_KEY = "faststile_data";
-  let dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-  let chart;
 
+  // ELEMENTOS
+  const descricaoInput = document.getElementById("descricao");
+  const valorInput = document.getElementById("valor");
+  const tipoSelect = document.getElementById("tipo");
   const lista = document.getElementById("lista");
   const toast = document.getElementById("toast");
 
+  const totalRendaEl = document.getElementById("totalRenda");
+  const totalDespesaEl = document.getElementById("totalDespesa");
+  const saldoTotalEl = document.getElementById("saldoTotal");
+
+  const valorConverter = document.getElementById("valorConverter");
+  const moeda = document.getElementById("moeda");
+  const resultadoConversao = document.getElementById("resultadoConversao");
+
+  const modalReset = document.getElementById("modalReset");
+  const graficoCanvas = document.getElementById("grafico");
+
+  let dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+  let chart = null;
+
+  // ===== STORAGE =====
   function salvar() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
   }
 
+  // ===== TOAST =====
   function mostrarToast(msg) {
     toast.textContent = msg;
     toast.classList.add("show");
     setTimeout(() => toast.classList.remove("show"), 2500);
   }
 
+  // ===== ATUALIZAR UI =====
   function atualizar() {
     lista.innerHTML = "";
-    let renda = 0, despesa = 0;
 
-    dados.slice().reverse().forEach(t => {
+    let renda = 0;
+    let despesa = 0;
+
+    dados.slice().reverse().forEach(item => {
       const li = document.createElement("li");
       li.innerHTML = `
-        <span class="${t.tipo}">${t.descricao}</span>
-        <strong class="${t.tipo}">R$ ${t.valor.toFixed(2)}</strong>
+        <span class="${item.tipo}">${item.descricao}</span>
+        <strong class="${item.tipo}">R$ ${item.valor.toFixed(2)}</strong>
       `;
       lista.appendChild(li);
 
-      t.tipo === "renda" ? renda += t.valor : despesa += t.valor;
+      item.tipo === "renda"
+        ? renda += item.valor
+        : despesa += item.valor;
     });
 
-    document.getElementById("totalRenda").textContent = `R$ ${renda.toFixed(2)}`;
-    document.getElementById("totalDespesa").textContent = `R$ ${despesa.toFixed(2)}`;
-    document.getElementById("saldoTotal").textContent = `R$ ${(renda - despesa).toFixed(2)}`;
+    totalRendaEl.textContent = `R$ ${renda.toFixed(2)}`;
+    totalDespesaEl.textContent = `R$ ${despesa.toFixed(2)}`;
+    saldoTotalEl.textContent = `R$ ${(renda - despesa).toFixed(2)}`;
 
     atualizarGrafico(renda, despesa);
   }
 
-  window.adicionar = () => {
+  // ===== ADICIONAR =====
+  window.adicionar = function () {
     const descricao = descricaoInput.value.trim();
-    const valor = parseFloat(valorInput.value);
+    const valor = Number(valorInput.value);
     const tipo = tipoSelect.value;
 
     if (!descricao || valor <= 0) {
@@ -56,76 +80,104 @@
 
     descricaoInput.value = "";
     valorInput.value = "";
-    mostrarToast("Registro adicionado");
+
+    mostrarToast("Registro salvo");
   };
 
-  function atualizarGrafico(r, d) {
+  // ===== GRÁFICO =====
+  function atualizarGrafico(renda, despesa) {
     if (chart) chart.destroy();
-    chart = new Chart(grafico, {
+
+    chart = new Chart(graficoCanvas, {
       type: "doughnut",
       data: {
         labels: ["Rendas", "Despesas"],
         datasets: [{
-          data: [r, d],
+          data: [renda, despesa],
           backgroundColor: ["#2ecc71", "#e74c3c"]
         }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: "bottom"
+          }
+        }
       }
     });
   }
 
-  window.exportarPDF = () => {
+  // ===== PDF =====
+  window.exportarPDF = function () {
     html2pdf().from(document.body).save("FastStile.pdf");
   };
 
-  window.exportarBackup = () => {
-    const blob = new Blob([JSON.stringify(dados)], { type: "application/json" });
+  // ===== BACKUP =====
+  window.exportarBackup = function () {
+    const blob = new Blob(
+      [JSON.stringify(dados)],
+      { type: "application/json" }
+    );
+
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
     a.download = "faststile_backup.json";
     a.click();
   };
 
-  window.importarBackup = () => {
+  window.importarBackup = function () {
     const input = document.createElement("input");
     input.type = "file";
     input.accept = ".json";
+
     input.onchange = e => {
       const reader = new FileReader();
       reader.onload = () => {
-        dados = JSON.parse(reader.result);
+        dados = JSON.parse(reader.result) || [];
         salvar();
         atualizar();
         mostrarToast("Backup importado");
       };
       reader.readAsText(e.target.files[0]);
     };
+
     input.click();
   };
 
-  window.converterMoeda = () => {
-    const valor = parseFloat(valorConverter.value);
-    const taxa = parseFloat(moeda.value);
-    if (!valor) return;
-    resultadoConversao.textContent = `R$ ${(valor * taxa).toFixed(2)}`;
+  // ===== CONVERSOR =====
+  window.converterMoeda = function () {
+    const valor = Number(valorConverter.value);
+    const taxa = Number(moeda.value);
+
+    if (!valor || !taxa) return;
+
+    resultadoConversao.textContent =
+      `R$ ${(valor * taxa).toFixed(2)}`;
   };
 
+  // ===== RESET =====
   window.abrirModalReset = () => modalReset.style.display = "flex";
   window.fecharModalReset = () => modalReset.style.display = "none";
 
-  window.confirmarReset = () => {
+  window.confirmarReset = function () {
     dados = [];
     salvar();
     atualizar();
+
     valorConverter.value = "";
     resultadoConversao.textContent = "";
+
     fecharModalReset();
-    mostrarToast("Dados resetados");
+    mostrarToast("Dados apagados");
   };
 
+  // ===== INIT =====
   atualizar();
 
+  // ===== SERVICE WORKER =====
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("/FastStile/sw.js");
+    navigator.serviceWorker.register("./sw.js");
   }
 
 })();
