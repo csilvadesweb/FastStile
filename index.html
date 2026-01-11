@@ -1,105 +1,102 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>FastStile — Elite Finance</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="theme-color" content="#020617">
+  <meta charset="UTF-8" />
+  <title>FastStile</title>
 
-  <link rel="stylesheet" href="style.css">
-  <link rel="manifest" href="manifest.json">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="theme-color" content="#0b2c3d" />
+  <meta name="description" content="FastStile - Controle financeiro inteligente, rápido e seguro." />
+
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icons/icon-192.png" />
+
+  <link rel="stylesheet" href="style.css" />
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
+
 <body>
 
-<header class="glass-nav">
-  <div class="nav-content">
-    <div class="logo-area">
-      <span class="logo-icon" style="font-size: 1.5rem;">💎</span>
-      <h1>FastStile <span style="font-weight: 400; opacity: 0.7;">PRO</span></h1>
-    </div>
-    <button id="theme-toggle" class="btn-circle" onclick="toggleTheme()" aria-label="Alternar Tema">🌓</button>
-  </div>
+<header>
+  <h1>FastStile</h1>
+  <span class="subtitle">Controle financeiro inteligente</span>
 </header>
 
-<main class="dashboard">
-  <section class="summary-grid">
-    <div class="status-card balance">
-      <small>Patrimônio Líquido</small>
-      <h2 id="resumoSaldo">R$ 0,00</h2>
-    </div>
-    <div class="status-card income">
-      <small>Fluxo de Entrada</small>
-      <h3 id="resumoRenda">R$ 0,00</h3>
-    </div>
-    <div class="status-card expenses">
-      <small>Fluxo de Saída</small>
-      <h3 id="resumoDespesa">R$ 0,00</h3>
-    </div>
-  </section>
+<main>
 
-  <div class="main-grid">
-    <section class="glass-card action-panel">
-      <h2 style="display: flex; align-items: center; gap: 10px;">📝 Nova Transação</h2>
-      <div class="input-container">
-        <input type="text" id="nomeDesc" placeholder="Descrição" autocomplete="off">
-        <input type="number" id="valorMontante" placeholder="Valor R$" step="0.01">
-        <select id="categoriaSelect">
-          <option value="moradia">🏠 Moradia</option>
-          <option value="transporte">🚗 Transporte</option>
-          <option value="saude">🏥 Saúde</option>
-          <option value="educacao">🎓 Educação</option>
-          <option value="compras">🛍️ Compras</option>
-          <option value="assinaturas">📺 Assinaturas</option>
-          <option value="investimentos">📈 Investimentos</option>
-          <option value="dividas">💳 Dívidas</option>
-          <option value="outros">📦 Outros</option>
-          <option value="imprevistos">🚨 Imprevistos</option>
-          <option value="impostos">🏛️ Impostos</option>
-        </select>
-      </div>
-      <div class="button-group">
-        <button type="button" onclick="adicionar('renda')" class="btn-elite btn-income">Receita +</button>
-        <button type="button" onclick="adicionar('despesa')" class="btn-elite btn-expense">Despesa —</button>
-      </div>
-      <hr style="margin: 20px 0; border: 0; border-top: 1px solid var(--card-border);">
-      <div class="conversor-moeda">
-        <h3 style="color: var(--text-muted);">Câmbio Rápido</h3>
-        <input type="number" id="valorConvert" placeholder="Valor em BRL" step="0.01">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-          <button onclick="converterMoeda('USD')" class="btn-elite btn-sec">BRL → USD</button>
-          <button onclick="converterMoeda('EUR')" class="btn-elite btn-sec">BRL → EUR</button>
-        </div>
-        <p id="resultadoConversao" style="text-align: center; margin-top: 15px;"></p>
-      </div>
-    </section>
+<section class="cards">
+  <div class="card income">
+    <h3>Rendas</h3>
+    <p id="totalRenda">R$ 0,00</p>
+  </div>
 
-    <div style="display: flex; flex-direction: column; gap: 20px;">
-      <section class="glass-card chart-panel">
-        <h2 style="display: flex; align-items: center; gap: 10px;">📊 Alocação</h2>
-        <div class="chart-container"><canvas id="graficoFinanceiro"></canvas></div>
-      </section>
-      <section class="glass-card history-panel">
-        <h2 style="display: flex; align-items: center; gap: 10px;">🕒 Atividade</h2>
-        <div id="listaHistorico" class="custom-scroll" style="min-height: 150px;"></div>
-        <div class="actions-grid" style="margin-top: 20px;">
-          <button onclick="exportarPDF()" class="btn-elite btn-pdf">📄 Gerar PDF</button>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
-            <button onclick="exportarBackup()" class="btn-elite btn-sec">💾 Backup</button>
-            <button onclick="importarBackup()" class="btn-elite btn-sec">📥 Importar</button>
-          </div>
-          <button onclick="zerarDados()" class="btn-elite btn-danger">⚠️ Limpar Tudo</button>
-        </div>
-      </section>
+  <div class="card expense">
+    <h3>Despesas</h3>
+    <p id="totalDespesa">R$ 0,00</p>
+  </div>
+
+  <div class="card balance">
+    <h3>Saldo</h3>
+    <p id="saldoTotal">R$ 0,00</p>
+  </div>
+</section>
+
+<section class="form-section">
+  <input type="text" id="descricao" placeholder="Descrição" />
+  <input type="number" id="valor" placeholder="Valor" />
+  <select id="tipo">
+    <option value="renda">Renda</option>
+    <option value="despesa">Despesa</option>
+  </select>
+  <button onclick="adicionar()">Adicionar</button>
+</section>
+
+<section class="list-section">
+  <h2>Histórico</h2>
+  <ul id="lista"></ul>
+</section>
+
+<section class="chart-section">
+  <canvas id="grafico"></canvas>
+</section>
+
+<section class="actions">
+  <button onclick="exportarPDF()">Exportar PDF</button>
+  <button onclick="exportarBackup()">Backup</button>
+  <button onclick="importarBackup()">Importar</button>
+  <button class="danger" onclick="abrirModalReset()">Resetar</button>
+</section>
+
+<section class="converter">
+  <h3>Conversor de Moeda</h3>
+  <input type="number" id="valorConverter" placeholder="Valor" />
+  <select id="moeda">
+    <option value="5">USD → BRL</option>
+    <option value="6">EUR → BRL</option>
+  </select>
+  <button onclick="converterMoeda()">Converter</button>
+  <p id="resultadoConversao"></p>
+</section>
+
+</main>
+
+<div id="toast" aria-live="polite"></div>
+
+<!-- Modal Reset -->
+<div id="modalReset" class="modal">
+  <div class="modal-content">
+    <h3>Confirmar Reset</h3>
+    <p>Deseja apagar todos os dados?</p>
+    <div class="modal-actions">
+      <button onclick="confirmarReset()">Sim</button>
+      <button onclick="fecharModalReset()">Cancelar</button>
     </div>
   </div>
-</main>
+</div>
+
 <script src="script.js"></script>
+
 </body>
 </html>
