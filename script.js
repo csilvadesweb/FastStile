@@ -1,13 +1,7 @@
 (() => {
   "use strict";
 
-  /* FASTSTILE CORE © 2026 C. SILVA
-     Software protegido pela Lei 9.609/98
-     Reprodução não autorizada caracteriza violação legal
-  */
-
   const STORAGE_KEY = "faststile_v2_core";
-  const AUDIT_KEY = "faststile_audit_log";
 
   const state = {
     dados: JSON.parse(localStorage.getItem(STORAGE_KEY)) || [],
@@ -23,7 +17,8 @@
     despesa: document.getElementById("totalDespesa"),
     saldo: document.getElementById("saldoTotal"),
     dica: document.getElementById("dicaFinanceira"),
-    toast: document.getElementById("toast")
+    toast: document.getElementById("toast"),
+    modalReset: document.getElementById("modalReset")
   };
 
   const gerarID = () =>
@@ -35,6 +30,10 @@
     UI.toast.textContent = msg;
     UI.toast.classList.add("show");
     setTimeout(() => UI.toast.classList.remove("show"), 2500);
+  }
+
+  function salvar() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state.dados));
   }
 
   function atualizar() {
@@ -49,22 +48,26 @@
           R$ ${item.valor.toFixed(2)}
         </strong>`;
       UI.lista.appendChild(li);
+
       item.tipo === "renda" ? (r += item.valor) : (d += item.valor);
     });
 
     UI.renda.textContent = `R$ ${r.toFixed(2)}`;
     UI.despesa.textContent = `R$ ${d.toFixed(2)}`;
     UI.saldo.textContent = `R$ ${(r - d).toFixed(2)}`;
-    UI.dica.textContent =
-      r - d >= 0 ? "✅ Gestão Financeira Saudável" : "⚠️ Atenção ao Saldo";
+    UI.dica.textContent = r - d >= 0
+      ? "✅ Gestão Financeira Saudável"
+      : "⚠️ Atenção ao Saldo";
 
     atualizarGrafico(r, d);
   }
 
   window.adicionar = () => {
     const valor = parseFloat(UI.val.value);
-    if (!UI.desc.value || isNaN(valor))
-      return toast("Preencha os campos corretamente.");
+    if (!UI.desc.value || isNaN(valor)) {
+      toast("Preencha os campos corretamente.");
+      return;
+    }
 
     state.dados.push({
       descricao: UI.desc.value,
@@ -72,7 +75,7 @@
       tipo: UI.tipo.value
     });
 
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state.dados));
+    salvar();
     UI.desc.value = "";
     UI.val.value = "";
     atualizar();
@@ -91,87 +94,119 @@
           borderWidth: 0
         }]
       },
-      options: { cutout: "85%", plugins: { legend: { display: false } } }
+      options: {
+        cutout: "85%",
+        plugins: { legend: { display: false } }
+      }
     });
   }
 
-  /* =================== BLINDAGEM ENTERPRISE =================== */
-
-  async function gerarHash(texto) {
-    const buffer = new TextEncoder().encode(texto);
-    const hash = await crypto.subtle.digest("SHA-256", buffer);
-    return Array.from(new Uint8Array(hash))
-      .map(b => b.toString(16).padStart(2, "0"))
-      .join("")
-      .toUpperCase();
-  }
-
-  function registrarAuditoria(registro) {
-    const logs = JSON.parse(localStorage.getItem(AUDIT_KEY)) || [];
-    logs.push(registro);
-    localStorage.setItem(AUDIT_KEY, JSON.stringify(logs));
-  }
-
-  window.exportarPDF = async () => {
-    toast("Gerando relatório financeiro seguro...");
+  // ================== PDF (CORRIGIDO) ==================
+  window.exportarPDF = () => {
+    toast("Gerando PDF financeiro...");
 
     const agora = new Date();
     const dataHora = agora.toLocaleString("pt-BR");
     const docID = gerarID();
 
     let r = 0, d = 0;
-    state.dados.forEach(i => (i.tipo === "renda" ? (r += i.valor) : (d += i.valor)));
+    state.dados.forEach(i => i.tipo === "renda" ? r += i.valor : d += i.valor);
 
     const moeda = n =>
       n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
-    const conteudoBase = JSON.stringify({
-      docID,
-      dataHora,
-      totalRenda: r,
-      totalDespesa: d,
-      saldo: r - d,
-      registros: state.dados.length
-    });
-
-    const hashDoc = await gerarHash(conteudoBase);
-
-    registrarAuditoria({
-      docID,
-      dataHora,
-      saldo: r - d,
-      hash: hashDoc
-    });
-
     const box = document.createElement("div");
-    box.style.padding = "35px";
+    box.style.padding = "30px";
+    box.style.background = "#ffffff";
+    box.style.color = "#1e293b";
     box.style.fontFamily = "Arial";
-    box.style.width = "760px";
+    box.style.width = "800px";
 
     box.innerHTML = `
       <h1>FastStile</h1>
-      <p><strong>Relatório Financeiro Oficial</strong></p>
-      <p>Emissão: ${dataHora}</p>
-
+      <p><strong>Relatório Financeiro</strong></p>
+      <p>Emitido em: ${dataHora}</p>
       <hr>
-
       <p>Receitas: <strong>${moeda(r)}</strong></p>
       <p>Despesas: <strong>${moeda(d)}</strong></p>
-      <p>Saldo Final: <strong>${moeda(r - d)}</strong></p>
-
+      <p>Saldo: <strong>${moeda(r - d)}</strong></p>
       <hr>
-
-      <p><strong>Assinatura Digital Enterprise</strong></p>
-      <p>ID do Documento: ${docID}</p>
-      <p>Hash SHA-256: ${hashDoc}</p>
-      <p>Responsável Técnico: C. Silva</p>
-      <p>Documento autenticado localmente</p>
+      <ul>
+        ${state.dados.map(i =>
+          `<li>${i.descricao} — ${moeda(i.valor)}</li>`
+        ).join("")}
+      </ul>
+      <small>ID do Documento: ${docID}</small>
     `;
 
-    html2pdf().set({
-      filename: `FastStile_${docID}.pdf`,
-      jsPDF: { format: "a4", orientation: "portrait" }
-    }).from(box).save();
+    document.body.appendChild(box);
+
+    html2pdf()
+      .set({
+        margin: 10,
+        filename: `FastStile_${docID}.pdf`,
+        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
+      })
+      .from(box)
+      .save()
+      .then(() => box.remove());
+  };
+
+  // ================= BACKUP =================
+  window.exportarBackup = () => {
+    const blob = new Blob(
+      [JSON.stringify(state.dados, null, 2)],
+      { type: "application/json" }
+    );
+
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "faststile_backup.json";
+    a.click();
+    URL.revokeObjectURL(a.href);
+  };
+
+  window.importarBackup = () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "application/json";
+
+    input.onchange = e => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          state.dados = JSON.parse(reader.result);
+          salvar();
+          atualizar();
+          toast("Backup importado com sucesso.");
+        } catch {
+          toast("Arquivo inválido.");
+        }
+      };
+      reader.readAsText(file);
+    };
+
+    input.click();
+  };
+
+  // ================= RESET =================
+  window.abrirModalReset = () => {
+    UI.modalReset.style.display = "flex";
+  };
+
+  window.fecharModalReset = () => {
+    UI.modalReset.style.display = "none";
+  };
+
+  window.confirmarReset = () => {
+    state.dados = [];
+    salvar();
+    atualizar();
+    fecharModalReset();
+    toast("Dados apagados com sucesso.");
   };
 
   atualizar();
