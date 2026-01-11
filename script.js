@@ -1,148 +1,104 @@
+/** * FASTSTILE PRO 2026 - COPYRIGHT C. SILVA 
+ * PROTEGIDO POR LEI DE SOFTWARE 9.609/98
+ */
 (() => {
   "use strict";
+  const STORAGE_KEY = "faststile_v2_core";
+  const state = { dados: JSON.parse(localStorage.getItem(STORAGE_KEY)) || [], chart: null };
 
-  const STORAGE_KEY = "faststile_data";
+  const UI = {
+    desc: document.getElementById("descricao"),
+    val: document.getElementById("valor"),
+    tipo: document.getElementById("tipo"),
+    lista: document.getElementById("lista"),
+    renda: document.getElementById("totalRenda"),
+    despesa: document.getElementById("totalDespesa"),
+    saldo: document.getElementById("saldoTotal"),
+    dica: document.getElementById("dicaFinanceira"),
+    toast: document.getElementById("toast")
+  };
 
-  // ELEMENTOS
-  const descricaoInput = document.getElementById("descricao");
-  const valorInput = document.getElementById("valor");
-  const tipoSelect = document.getElementById("tipo");
-  const lista = document.getElementById("lista");
-  const toast = document.getElementById("toast");
-
-  const totalRendaEl = document.getElementById("totalRenda");
-  const totalDespesaEl = document.getElementById("totalDespesa");
-  const saldoTotalEl = document.getElementById("saldoTotal");
-
-  const valorConverter = document.getElementById("valorConverter");
-  const moeda = document.getElementById("moeda");
-  const resultadoConversao = document.getElementById("resultadoConversao");
-
-  const modalReset = document.getElementById("modalReset");
-  const graficoCanvas = document.getElementById("grafico");
-
-  let dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-  let chart = null;
-
-  function salvar() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
+  function mostrarToast(m) {
+    UI.toast.textContent = m;
+    UI.toast.classList.add("show");
+    setTimeout(() => UI.toast.classList.remove("show"), 2500);
   }
 
-  function mostrarToast(msg) {
-    toast.textContent = msg;
-    toast.classList.add("show");
-    setTimeout(() => toast.classList.remove("show"), 2500);
+  function atualizarInsights(r, d) {
+    const s = r - d;
+    if (state.dados.length === 0) return UI.dica.textContent = "🔒 Seus dados financeiros estão criptografados localmente.";
+    if (s < 0) return UI.dica.textContent = "⚠️ Atenção: Suas despesas ultrapassaram as receitas.";
+    if (s > (r * 0.3)) return UI.dica.textContent = "🚀 Parabéns! Você poupou mais de 30% da sua renda.";
+    UI.dica.textContent = "💡 Dica: Registre todos os seus gastos, mesmo os pequenos.";
   }
 
   function atualizar() {
-    lista.innerHTML = "";
-    let renda = 0;
-    let despesa = 0;
-
-    dados.slice().reverse().forEach(item => {
+    UI.lista.innerHTML = "";
+    let r = 0, d = 0;
+    state.dados.slice().reverse().forEach(item => {
       const li = document.createElement("li");
-      li.innerHTML = `
-        <span class="${item.tipo}">${item.descricao}</span>
-        <strong class="${item.tipo}">R$ ${item.valor.toFixed(2)}</strong>
-      `;
-      lista.appendChild(li);
-      item.tipo === "renda" ? renda += item.valor : despesa += item.valor;
+      li.innerHTML = `<span style="color:#64748b">${item.descricao}</span><strong style="color:${item.tipo==='renda'?'#10b981':'#ef4444'}">R$ ${item.valor.toFixed(2)}</strong>`;
+      UI.lista.appendChild(li);
+      item.tipo === "renda" ? r += item.valor : d += item.valor;
     });
-
-    totalRendaEl.textContent = `R$ ${renda.toFixed(2)}`;
-    totalDespesaEl.textContent = `R$ ${despesa.toFixed(2)}`;
-    saldoTotalEl.textContent = `R$ ${(renda - despesa).toFixed(2)}`;
-
-    atualizarGrafico(renda, despesa);
+    UI.renda.textContent = `R$ ${r.toFixed(2)}`;
+    UI.despesa.textContent = `R$ ${d.toFixed(2)}`;
+    UI.saldo.textContent = `R$ ${(r - d).toFixed(2)}`;
+    atualizarGrafico(r, d);
+    atualizarInsights(r, d);
   }
 
-  window.adicionar = function () {
-    const descricao = descricaoInput.value.trim();
-    const valor = parseFloat(valorInput.value);
-    if (!descricao || isNaN(valor) || valor <= 0) {
-      mostrarToast("Preencha os campos corretamente");
-      return;
-    }
-    dados.push({ descricao, valor, tipo: tipoSelect.value });
-    salvar();
+  window.adicionar = () => {
+    const desc = UI.desc.value.trim();
+    const val = parseFloat(UI.val.value);
+    if (!desc || isNaN(val)) return mostrarToast("Dados inválidos");
+    state.dados.push({ descricao: desc, valor: val, tipo: UI.tipo.value });
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state.dados));
     atualizar();
-    descricaoInput.value = "";
-    valorInput.value = "";
-    mostrarToast("Salvo com sucesso!");
+    UI.desc.value = ""; UI.val.value = "";
+    mostrarToast("Registro salvo!");
   };
 
-  function atualizarGrafico(renda, despesa) {
-    if (chart) chart.destroy();
-    chart = new Chart(graficoCanvas, {
+  function atualizarGrafico(r, d) {
+    if (state.chart) state.chart.destroy();
+    if (r === 0 && d === 0) return;
+    state.chart = new Chart(document.getElementById("grafico"), {
       type: "doughnut",
-      data: {
-        labels: ["Rendas", "Despesas"],
-        datasets: [{
-          data: [renda, despesa],
-          backgroundColor: ["#2ecc71", "#e74c3c"]
-        }]
-      },
-      options: { responsive: true }
+      data: { datasets: [{ data: [r, d], backgroundColor: ["#10b981", "#ef4444"], borderWeight: 0 }] },
+      options: { cutout: '85%', plugins: { legend: { display: false } } }
     });
   }
 
-  window.exportarPDF = function () {
-    const opt = { margin: 1, filename: 'FastStile.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' } };
-    html2pdf().set(opt).from(document.body).save();
-  };
-
-  window.exportarBackup = function () {
-    const blob = new Blob([JSON.stringify(dados)], { type: "application/json" });
+  window.exportarPDF = () => html2pdf().from(document.body).save("FastStile_Relatorio.pdf");
+  window.exportarBackup = () => {
+    const b = new Blob([JSON.stringify(state.dados)], { type: "application/json" });
     const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "faststile_backup.json";
-    a.click();
+    a.href = URL.createObjectURL(b); a.download = "faststile_backup.json"; a.click();
   };
-
-  window.importarBackup = function () {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = ".json";
-    input.onchange = e => {
+  window.importarBackup = () => {
+    const i = document.createElement("input"); i.type = "file"; i.accept = ".json";
+    i.onchange = e => {
       const reader = new FileReader();
       reader.onload = () => {
-        try {
-          dados = JSON.parse(reader.result);
-          salvar();
-          atualizar();
-          mostrarToast("Backup importado!");
-        } catch(err) { mostrarToast("Erro no arquivo"); }
+        state.dados = JSON.parse(reader.result);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state.dados));
+        atualizar(); mostrarToast("Backup restaurado!");
       };
       reader.readAsText(e.target.files[0]);
     };
-    input.click();
+    i.click();
   };
 
-  window.converterMoeda = function () {
-    const valor = parseFloat(valorConverter.value);
-    const taxa = parseFloat(moeda.value);
-    if (isNaN(valor)) return;
-    resultadoConversao.textContent = `R$ ${(valor * taxa).toFixed(2)}`;
-  };
+  window.abrirPrivacidade = () => document.getElementById("modalPrivacidade").style.display = "flex";
+  window.fecharPrivacidade = () => document.getElementById("modalPrivacidade").style.display = "none";
+  window.abrirModalReset = () => document.getElementById("modalReset").style.display = "flex";
+  window.fecharModalReset = () => document.getElementById("modalReset").style.display = "none";
+  window.confirmarReset = () => { localStorage.clear(); location.reload(); };
 
-  window.abrirModalReset = () => modalReset.style.display = "flex";
-  window.fecharModalReset = () => modalReset.style.display = "none";
-  window.confirmarReset = () => {
-    dados = [];
-    salvar();
-    atualizar();
-    fecharModalReset();
-    mostrarToast("Dados zerados");
-  };
+  window.addEventListener('load', () => {
+    if (!localStorage.getItem('p_acc')) { abrirPrivacidade(); localStorage.setItem('p_acc', '1'); }
+  });
 
   atualizar();
-
-  // Registro do Service Worker corrigido
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-      navigator.serviceWorker.register("./sw.js")
-        .then(reg => console.log("SW OK"))
-        .catch(err => console.log("SW Erro", err));
-    });
-  }
+  if ("serviceWorker" in navigator) navigator.serviceWorker.register("./sw.js");
 })();
