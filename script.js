@@ -21,6 +21,7 @@
         let r = 0, d = 0;
         state.dados.slice().reverse().forEach(item => {
             const li = document.createElement("li");
+            li.style.cssText = "background:var(--card-bg); padding:16px; border-radius:15px; margin-bottom:10px; display:flex; justify-content:space-between; box-shadow: 0 2px 4px rgba(0,0,0,0.05);";
             li.innerHTML = `<span>${item.descricao}</span><strong style="color:${item.tipo==='renda'?'#10b981':'#ef4444'}">R$ ${item.valor.toFixed(2)}</strong>`;
             UI.lista.appendChild(li);
             item.tipo === "renda" ? r += item.valor : d += item.valor;
@@ -66,24 +67,23 @@
         state.dados.forEach(i => i.tipo === 'renda' ? r += i.valor : d += i.valor);
 
         const element = document.createElement('div');
+        element.style.cssText = "width:700px; padding:40px; background:white; color:#1e293b; font-family:Arial;";
         element.innerHTML = `
-            <div style="padding: 30px; background: white; width: 750px; margin: auto; font-family: Arial, sans-serif; color: #1e293b;">
-                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid #0f172a; padding-bottom: 20px; margin-bottom: 30px;">
-                    <div><h1 style="margin: 0; color: #0f172a; font-size: 32px;">FastStile</h1><p style="text-transform: uppercase; font-size: 11px;">Relatório de Fluxo de Caixa</p></div>
-                    <div style="text-align: right; font-size: 11px;"><p>Emissão: ${new Date().toLocaleDateString()}</p></div>
-                </div>
-                <div style="display: flex; gap: 10px; margin-bottom: 30px;">
-                    <div style="flex:1; background:#f1f5f9; padding:15px; border-radius:10px; text-align:center;">RECEITAS<br><b style="color:#10b981">${formatar(r)}</b></div>
-                    <div style="flex:1; background:#f1f5f9; padding:15px; border-radius:10px; text-align:center;">DESPESAS<br><b style="color:#ef4444">${formatar(d)}</b></div>
-                    <div style="flex:1; background:#0f172a; padding:15px; border-radius:10px; text-align:center; color:white;">SALDO<br><b>${formatar(r-d)}</b></div>
-                </div>
-                <table style="width: 100%; border-collapse: collapse;">
-                    <thead style="background: #f8fafc;"><tr><th style="padding:10px; text-align:left;">Descrição</th><th style="text-align:right; padding:10px;">Valor</th></tr></thead>
-                    <tbody>${state.dados.map(i => `<tr><td style="padding:10px; border-bottom:1px solid #f1f5f9;">${i.descricao}</td><td style="text-align:right; padding:10px; color:${i.tipo==='renda'?'#10b981':'#ef4444'}">${formatar(i.valor)}</td></tr>`).join('')}</tbody>
-                </table>
-            </div>`;
+            <div style="display:flex; justify-content:space-between; border-bottom:4px solid #0f172a; padding-bottom:20px; margin-bottom:30px;">
+                <div><h1 style="margin:0; font-size:32px;">FastStile</h1><p>EXTRATO FINANCEIRO</p></div>
+                <div style="text-align:right;">Emissão: ${new Date().toLocaleDateString()}<br><b style="color:#10b981;">Autenticado</b></div>
+            </div>
+            <div style="display:flex; gap:10px; margin-bottom:30px;">
+                <div style="flex:1; background:#f8fafc; padding:15px; border-radius:10px; border:1px solid #eee; text-align:center;">RECEITAS<br><b>${formatar(r)}</b></div>
+                <div style="flex:1; background:#f8fafc; padding:15px; border-radius:10px; border:1px solid #eee; text-align:center;">DESPESAS<br><b>${formatar(d)}</b></div>
+                <div style="flex:1; background:#0f172a; padding:15px; border-radius:10px; color:white; text-align:center;">SALDO<br><b>${formatar(r-d)}</b></div>
+            </div>
+            <table style="width:100%; border-collapse:collapse;">
+                <thead style="background:#f1f5f9;"><tr><th style="padding:10px; text-align:left;">Descrição</th><th style="text-align:right; padding:10px;">Valor</th></tr></thead>
+                <tbody>${state.dados.map(i => `<tr><td style="padding:10px; border-bottom:1px solid #eee;">${i.descricao}</td><td style="text-align:right; padding:10px; font-weight:bold; color:${i.tipo==='renda'?'#10b981':'#ef4444'}">${formatar(i.valor)}</td></tr>`).join('')}</tbody>
+            </table>`;
 
-        html2pdf().set({ margin: 10, filename: 'Relatorio_FastStile.pdf', html2canvas: { scale: 2, scrollY: 0 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } }).from(element).save();
+        html2pdf().set({ margin: 10, filename: 'Relatorio_FastStile.pdf', html2canvas: { scale: 3 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } }).from(element).save();
     };
 
     window.exportarBackup = () => {
