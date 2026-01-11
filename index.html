@@ -6,7 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <meta name="author" content="C. Silva">
   <meta name="copyright" content="© 2026 FastStile. Todos os direitos reservados.">
-  <meta name="description" content="Controle financeiro privado e seguro com armazenamento local.">
   <meta name="theme-color" content="#0f172a" />
   
   <link rel="manifest" href="manifest.json" />
@@ -26,7 +25,7 @@
 </header>
 
 <main>
-  <section class="insight-card" id="insightCard">
+  <section class="insight-card">
     <p id="dicaFinanceira">Iniciando ambiente seguro...</p>
   </section>
 
@@ -67,18 +66,18 @@
   </section>
 
   <footer>
-    <p>© 2026 FastStile - <a href="#" onclick="abrirPrivacidade()">Termos & Privacidade</a></p>
+    <p>© 2026 FastStile - <a href="privacy.html">Termos & Privacidade</a></p>
   </footer>
 </main>
 
 <div id="toast"></div>
 
 <div id="modalPrivacidade" class="modal">
-  <div class="modal-content privacy-content">
+  <div class="modal-content">
     <h3>Termos & Privacidade</h3>
     <div class="privacy-text">
-      <p><strong>Proteção Jurídica:</strong> Este software é protegido pela Lei 9.609/98. Cópia ou plágio são crimes sujeitos a sanções.</p>
-      <p><strong>Soberania de Dados:</strong> Suas finanças são processadas localmente. Não coletamos dados em nuvem.</p>
+      <p><strong>Proteção Jurídica:</strong> Software protegido pela Lei 9.609/98. Cópia ou plágio são crimes.</p>
+      <p><strong>Privacidade:</strong> Dados processados localmente. Sem coleta em nuvem.</p>
     </div>
     <button class="btn-main" onclick="fecharPrivacidade()">Aceitar e Iniciar</button>
   </div>
@@ -87,7 +86,6 @@
 <div id="modalReset" class="modal">
   <div class="modal-content">
     <h3>Zerar Tudo?</h3>
-    <p>Esta ação é irreversível.</p>
     <div class="modal-actions">
       <button class="danger" onclick="confirmarReset()">Confirmar</button>
       <button onclick="fecharModalReset()">Cancelar</button>
@@ -95,6 +93,7 @@
   </div>
 </div>
 
+<script src="App.js"></script>
 <script src="script.js"></script>
 </body>
 </html>
