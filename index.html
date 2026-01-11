@@ -5,9 +5,9 @@
   <title>FastStile - Gestão Financeira Inteligente</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <meta name="author" content="C. Silva">
-  <meta name="copyright" content="© 2026 FastStile. Todos os direitos reservados.">
+  <meta name="copyright" content="© 2026 FastStile">
   <meta name="theme-color" content="#0f172a" />
-  
+
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="icons/icon-192.png" />
   <link rel="stylesheet" href="style.css" />
@@ -15,6 +15,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
+
 <body oncontextmenu="return false;">
 
 <header>
@@ -26,14 +27,24 @@
 </header>
 
 <main>
+
   <section class="insight-card">
     <p id="dicaFinanceira">Iniciando ambiente seguro...</p>
   </section>
 
   <section class="cards">
-    <div class="card income"><h3>Rendas</h3><p id="totalRenda">R$ 0,00</p></div>
-    <div class="card expense"><h3>Despesas</h3><p id="totalDespesa">R$ 0,00</p></div>
-    <div class="card balance"><h3>Saldo Atual</h3><p id="saldoTotal">R$ 0,00</p></div>
+    <div class="card income">
+      <h3>Rendas</h3>
+      <p id="totalRenda">R$ 0,00</p>
+    </div>
+    <div class="card expense">
+      <h3>Despesas</h3>
+      <p id="totalDespesa">R$ 0,00</p>
+    </div>
+    <div class="card balance">
+      <h3>Saldo Atual</h3>
+      <p id="saldoTotal">R$ 0,00</p>
+    </div>
   </section>
 
   <section class="form-section">
@@ -69,10 +80,12 @@
   <footer>
     <p>© 2026 FastStile - <a href="privacy.html">Termos & Privacidade</a></p>
   </footer>
+
 </main>
 
 <div id="toast"></div>
 
+<!-- MODAL PRIVACIDADE -->
 <div id="modalPrivacidade" class="modal">
   <div class="modal-content">
     <h3>Termos & Privacidade</h3>
@@ -80,10 +93,13 @@
       <p><strong>Proteção Jurídica:</strong> Software protegido pela Lei 9.609/98.</p>
       <p><strong>Privacidade:</strong> Dados processados localmente. Sem coleta em nuvem.</p>
     </div>
-    <button class="btn-main" onclick="fecharPrivacidade()">Aceitar e Iniciar</button>
+    <button id="btnAceitarPrivacidade" class="btn-main">
+      Aceitar e Iniciar
+    </button>
   </div>
 </div>
 
+<!-- MODAL RESET -->
 <div id="modalReset" class="modal">
   <div class="modal-content">
     <h3>Zerar Tudo?</h3>
