@@ -11,62 +11,76 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: Arial, sans-serif;
+  font-family: 'Segoe UI', Arial, sans-serif;
 }
 
 body {
   background: var(--bg);
   color: var(--text);
+  line-height: 1.6;
 }
 
 header {
   background: var(--primary);
   color: #fff;
-  padding: 15px;
+  padding: 20px 15px;
   text-align: center;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
 .subtitle {
-  font-size: 0.9em;
-  opacity: 0.8;
+  font-size: 0.85em;
+  opacity: 0.9;
+  display: block;
 }
 
 main {
   padding: 15px;
+  max-width: 600px;
+  margin: 0 auto;
 }
 
 .cards {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
+  gap: 8px;
+  margin-bottom: 20px;
 }
 
 .card {
   background: var(--card);
-  padding: 15px;
+  padding: 12px 5px;
   border-radius: 8px;
   text-align: center;
-  font-weight: bold;
+  font-size: 0.9em;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
-.income { border-left: 5px solid var(--income); }
-.expense { border-left: 5px solid var(--expense); }
-.balance { border-left: 5px solid var(--primary); }
+.card h3 { font-size: 0.8em; margin-bottom: 5px; color: #666; }
+.card p { font-weight: bold; font-size: 1em; overflow: hidden; text-overflow: ellipsis; }
 
-.form-section,
-.actions,
-.converter {
-  margin-top: 15px;
+.income { border-top: 4px solid var(--income); }
+.expense { border-top: 4px solid var(--expense); }
+.balance { border-top: 4px solid var(--primary); }
+
+.form-section, .actions, .converter {
+  background: var(--card);
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 15px;
   display: flex;
-  gap: 8px;
+  gap: 10px;
   flex-wrap: wrap;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
 input, select, button {
-  padding: 10px;
+  padding: 12px;
   border-radius: 6px;
-  border: 1px solid #ccc;
+  border: 1px solid #ddd;
   flex: 1;
+  min-width: 120px;
+  font-size: 16px; /* Evita zoom automático no iOS */
 }
 
 button {
@@ -74,65 +88,76 @@ button {
   color: #fff;
   cursor: pointer;
   border: none;
+  font-weight: bold;
+  transition: opacity 0.2s;
 }
 
-button.danger {
-  background: #c0392b;
-}
+button:active { opacity: 0.7; }
 
-.list-section ul {
-  list-style: none;
-  margin-top: 10px;
-}
+button.danger { background: #c0392b; }
+
+.list-section h2 { margin-bottom: 10px; font-size: 1.2em; }
+.list-section ul { list-style: none; }
 
 .list-section li {
   background: var(--card);
-  padding: 8px;
-  margin-bottom: 5px;
+  padding: 12px;
+  margin-bottom: 8px;
   border-radius: 6px;
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
 .renda { color: var(--income); }
 .despesa { color: var(--expense); }
 
-#toast {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #333;
-  color: #fff;
-  padding: 10px 20px;
-  border-radius: 20px;
-  opacity: 0;
-  transition: opacity 0.3s;
+.chart-section {
+  background: var(--card);
+  padding: 15px;
+  border-radius: 8px;
+  margin: 20px 0;
 }
 
-#toast.show {
-  opacity: 1;
+#toast {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.8);
+  color: #fff;
+  padding: 12px 25px;
+  border-radius: 30px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+  z-index: 9999;
 }
+
+#toast.show { opacity: 1; }
 
 .modal {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.6);
+  background: rgba(0,0,0,0.7);
   align-items: center;
   justify-content: center;
+  z-index: 10000;
 }
 
 .modal-content {
   background: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  width: 90%;
-  max-width: 300px;
+  padding: 25px;
+  border-radius: 12px;
+  width: 85%;
+  max-width: 350px;
+  text-align: center;
 }
 
 .modal-actions {
   display: flex;
   gap: 10px;
-  margin-top: 15px;
+  margin-top: 20px;
 }
