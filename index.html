@@ -1,116 +1,205 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <title>FastStile - Gestão Financeira Inteligente</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-  <meta name="author" content="C. Silva">
-  <meta name="copyright" content="© 2026 FastStile">
-  <meta name="theme-color" content="#0f172a" />
+<meta charset="UTF-8">
+<title>FastStile Enterprise</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <link rel="manifest" href="manifest.json" />
-  <link rel="icon" href="icons/icon-192.png" />
-  <link rel="stylesheet" href="style.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<style>
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial;
+  background:#eef2f6;
+  color:#1f2937
+}
+header{
+  background:linear-gradient(135deg,#0b2c3d,#133e55);
+  color:#fff;
+  padding:20px;
+  font-size:22px;
+  font-weight:800
+}
+.container{
+  max-width:720px;
+  margin:auto;
+  padding:16px
+}
+.card{
+  background:#fff;
+  border-radius:16px;
+  padding:18px;
+  margin-bottom:14px;
+  box-shadow:0 12px 30px rgba(0,0,0,.08)
+}
+.card h3{
+  margin:0 0 6px;
+  font-size:15px;
+  font-weight:700;
+  color:#475569
+}
+.value{
+  font-size:24px;
+  font-weight:900
+}
+.btn{
+  width:100%;
+  border:none;
+  padding:14px;
+  border-radius:12px;
+  font-size:15px;
+  font-weight:800;
+  margin-top:8px;
+  cursor:pointer
+}
+.primary{background:#0b2c3d;color:#fff}
+.secondary{background:#e5e7eb}
+.footer{
+  text-align:center;
+  font-size:12px;
+  color:#64748b;
+  margin:20px 0
+}
+</style>
 </head>
 
-<body oncontextmenu="return false;">
+<body>
 
-<header>
-  <button id="theme-toggle" onclick="toggleTheme()" aria-label="Alternar Tema">🌓</button>
-  <div class="header-content">
-    <h1>FastStile</h1>
-    <span class="badge">Original & Seguro</span>
+<header>FastStile • Enterprise</header>
+
+<div class="container">
+
+  <div class="card">
+    <h3>Receitas</h3>
+    <div class="value" id="receitas">R$ 0,00</div>
   </div>
-</header>
 
-<main>
-
-  <section class="insight-card">
-    <p id="dicaFinanceira">Iniciando ambiente seguro...</p>
-  </section>
-
-  <section class="cards">
-    <div class="card income">
-      <h3>Rendas</h3>
-      <p id="totalRenda">R$ 0,00</p>
-    </div>
-    <div class="card expense">
-      <h3>Despesas</h3>
-      <p id="totalDespesa">R$ 0,00</p>
-    </div>
-    <div class="card balance">
-      <h3>Saldo Atual</h3>
-      <p id="saldoTotal">R$ 0,00</p>
-    </div>
-  </section>
-
-  <section class="form-section">
-    <div class="input-group">
-      <input type="text" id="descricao" placeholder="Ex: Salário" autocomplete="off" />
-      <input type="number" id="valor" placeholder="Valor R$" />
-    </div>
-    <div class="input-group">
-      <select id="tipo">
-        <option value="renda">Receita (+)</option>
-        <option value="despesa">Despesa (-)</option>
-      </select>
-      <button class="btn-main" onclick="adicionar()">Salvar Registro</button>
-    </div>
-  </section>
-
-  <section class="chart-section">
-    <canvas id="grafico"></canvas>
-  </section>
-
-  <section class="list-section">
-    <h2>Fluxo de Caixa</h2>
-    <ul id="lista"></ul>
-  </section>
-
-  <section class="actions">
-    <button onclick="exportarPDF()" class="btn-pdf">PDF Premium</button>
-    <button onclick="exportarBackup()">Backup</button>
-    <button onclick="importarBackup()">Importar</button>
-    <button class="danger" onclick="abrirModalReset()">Resetar</button>
-  </section>
-
-  <footer>
-    <p>© 2026 FastStile - <a href="privacy.html">Termos & Privacidade</a></p>
-  </footer>
-
-</main>
-
-<div id="toast"></div>
-
-<!-- MODAL PRIVACIDADE -->
-<div id="modalPrivacidade" class="modal">
-  <div class="modal-content">
-    <h3>Termos & Privacidade</h3>
-    <div class="privacy-text">
-      <p><strong>Proteção Jurídica:</strong> Software protegido pela Lei 9.609/98.</p>
-      <p><strong>Privacidade:</strong> Dados processados localmente. Sem coleta em nuvem.</p>
-    </div>
-    <button id="btnAceitarPrivacidade" class="btn-main">
-      Aceitar e Iniciar
-    </button>
+  <div class="card">
+    <h3>Despesas</h3>
+    <div class="value" id="despesas">R$ 0,00</div>
   </div>
+
+  <div class="card">
+    <h3>Saldo Atual</h3>
+    <div class="value" id="saldo">R$ 0,00</div>
+  </div>
+
+  <button class="btn primary" onclick="gerarPDF()">📄 Relatório PDF Enterprise</button>
+  <button class="btn secondary" onclick="backup()">💾 Backup</button>
+  <button class="btn secondary" onclick="importar()">📥 Importar</button>
+  <button class="btn secondary" onclick="resetar()">♻ Resetar</button>
+
+  <input type="file" id="fileInput" hidden>
+
 </div>
 
-<!-- MODAL RESET -->
-<div id="modalReset" class="modal">
-  <div class="modal-content">
-    <h3>Zerar Tudo?</h3>
-    <div class="modal-actions">
-      <button class="danger" onclick="confirmarReset()">Confirmar</button>
-      <button onclick="fecharModalReset()">Cancelar</button>
-    </div>
-  </div>
+<div class="footer">
+  Documento financeiro oficial • FastStile © 2026
 </div>
 
-<script src="App.js"></script>
-<script src="script.js"></script>
+<script>
+const STORAGE_KEY="faststile_data";
+
+function carregar(){
+  const d=JSON.parse(localStorage.getItem(STORAGE_KEY))||{receitas:0,despesas:0};
+  atualizar(d);
+}
+
+function atualizar(d){
+  receitas.innerText=formatar(d.receitas);
+  despesas.innerText=formatar(d.despesas);
+  saldo.innerText=formatar(d.receitas-d.despesas);
+}
+
+function formatar(v){
+  return v.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+}
+
+function gerarPDF(){
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF("p","mm","a4");
+
+  const d=JSON.parse(localStorage.getItem(STORAGE_KEY))||{receitas:0,despesas:0};
+  const saldo=d.receitas-d.despesas;
+  const id=crypto.randomUUID().slice(0,12).toUpperCase();
+
+  doc.setFont("helvetica","bold");
+  doc.setFontSize(22);
+  doc.text("FastStile",20,22);
+
+  doc.setFontSize(12);
+  doc.text("Relatório Financeiro Enterprise",20,30);
+
+  doc.line(20,34,190,34);
+
+  doc.setFont("helvetica","normal");
+  doc.text(`Emitido em: ${new Date().toLocaleString("pt-BR")}`,20,42);
+
+  doc.setFontSize(14);
+  doc.text(`Receitas: ${formatar(d.receitas)}`,20,62);
+  doc.text(`Despesas: ${formatar(d.despesas)}`,20,74);
+
+  doc.setFont("helvetica","bold");
+  doc.text(`Saldo: ${formatar(saldo)}`,20,90);
+
+  // Gráfico vetorial simples
+  doc.setDrawColor(11,44,61);
+  doc.rect(20,105,150,40);
+
+  const max=Math.max(d.receitas,d.despesas,1);
+  const rBar=(d.receitas/max)*120;
+  const dBar=(d.despesas/max)*120;
+
+  doc.setFillColor(11,44,61);
+  doc.rect(25,130-rBar/4,40,rBar/4,"F");
+
+  doc.setFillColor(150,0,0);
+  doc.rect(85,130-dBar/4,40,dBar/4,"F");
+
+  doc.setFontSize(10);
+  doc.text("Receitas",30,138);
+  doc.text("Despesas",90,138);
+
+  doc.setFont("helvetica","italic");
+  doc.text("Assinado digitalmente por FastStile Finance",20,265);
+
+  doc.setFont("helvetica","normal");
+  doc.text(`ID do Documento: ${id}`,20,272);
+
+  doc.save(`FastStile-${id}.pdf`);
+}
+
+function backup(){
+  const blob=new Blob([localStorage.getItem(STORAGE_KEY)],{type:"application/json"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="faststile-backup.json";
+  a.click();
+}
+
+function importar(){
+  fileInput.click();
+  fileInput.onchange=e=>{
+    const r=new FileReader();
+    r.onload=()=>{
+      localStorage.setItem(STORAGE_KEY,r.result);
+      carregar();
+      alert("Backup importado com sucesso!");
+    };
+    r.readAsText(e.target.files[0]);
+  };
+}
+
+function resetar(){
+  if(confirm("Deseja apagar todos os dados?")){
+    localStorage.removeItem(STORAGE_KEY);
+    carregar();
+  }
+}
+
+carregar();
+</script>
+
 </body>
 </html>
