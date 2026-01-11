@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <title>FastStile</title>
 
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <meta name="theme-color" content="#0b2c3d" />
   <meta name="description" content="FastStile - Controle financeiro inteligente, rápido e seguro." />
 
@@ -73,8 +73,8 @@
   <h3>Conversor de Moeda</h3>
   <input type="number" id="valorConverter" placeholder="Valor" />
   <select id="moeda">
-    <option value="5">USD → BRL</option>
-    <option value="6">EUR → BRL</option>
+    <option value="5.50">USD → BRL</option>
+    <option value="6.00">EUR → BRL</option>
   </select>
   <button onclick="converterMoeda()">Converter</button>
   <p id="resultadoConversao"></p>
@@ -84,7 +84,6 @@
 
 <div id="toast" aria-live="polite"></div>
 
-<!-- Modal Reset -->
 <div id="modalReset" class="modal">
   <div class="modal-content">
     <h3>Confirmar Reset</h3>
