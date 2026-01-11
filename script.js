@@ -21,7 +21,7 @@
         let r = 0, d = 0;
         state.dados.slice().reverse().forEach(item => {
             const li = document.createElement("li");
-            li.style.cssText = "background:var(--card-bg); padding:16px; border-radius:15px; margin-bottom:10px; display:flex; justify-content:space-between; box-shadow:0 2px 4px rgba(0,0,0,0.05);";
+            li.style.cssText = "background:var(--card-bg); padding:16px; border-radius:15px; margin-bottom:10px; display:flex; justify-content:space-between; box-shadow:0 2px 4px rgba(0,0,0,0.05); transition: 0.3s;";
             li.innerHTML = `<span>${item.descricao}</span><strong style="color:${item.tipo==='renda'?'#10b981':'#ef4444'}">R$ ${item.valor.toFixed(2)}</strong>`;
             UI.lista.appendChild(li);
             item.tipo === "renda" ? r += item.valor : d += item.valor;
@@ -61,45 +61,64 @@
     }
 
     window.exportarPDF = () => {
-        mostrarToast("Autenticando Relatório...");
+        if (state.dados.length === 0) return mostrarToast("Adicione dados primeiro!");
+        
+        mostrarToast("Autenticando e Gerando...");
+        
         const agora = new Date();
-        const authID = `FS-${Math.random().toString(36).substr(2, 9).toUpperCase()}-${agora.getTime().toString().slice(-4)}`;
+        const dataH = agora.toLocaleDateString('pt-br');
+        const horaH = agora.toLocaleTimeString('pt-br');
+        const authID = `FS-${Math.random().toString(36).substr(2, 7).toUpperCase()}-${agora.getTime().toString().slice(-4)}`;
+        
         const formatar = n => n.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' });
         let r = 0, d = 0;
-        state.dados.forEach(i => r += (i.tipo === 'renda' ? i.valor : 0), d += (i.tipo === 'despesa' ? i.valor : 0));
+        state.dados.forEach(i => i.tipo === 'renda' ? r += i.valor : d += i.valor);
 
+        // Template do PDF otimizado para renderização rápida
         const element = document.createElement('div');
-        element.style.cssText = "width:750px; padding:40px; background:white; color:#1e293b; font-family:Arial; position:relative;";
+        element.style.cssText = "width:700px; padding:30px; background:white; color:#1e293b; font-family:Arial, sans-serif;";
         element.innerHTML = `
-            <div style="position:absolute; top:40%; left:15%; font-size:50px; color:rgba(0,0,0,0.03); transform:rotate(-45deg); pointer-events:none;">DOCUMENTO AUTENTICADO</div>
-            <div style="display:flex; justify-content:space-between; border-bottom:4px solid #0f172a; padding-bottom:20px; margin-bottom:30px;">
-                <div><h1 style="margin:0; color:#0f172a; font-size:32px;">FastStile Pro</h1><p>RELATÓRIO ENTERPRISE</p></div>
+            <div style="border-bottom:4px solid #0f172a; padding-bottom:15px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center;">
+                <div><h1 style="margin:0; color:#0f172a;">FastStile Pro</h1><p style="font-size:10px; color:#64748b;">ENTERPRISE REPORT</p></div>
                 <div style="text-align:right; font-size:11px;">
-                    <b>Data:</b> ${agora.toLocaleDateString()}<br>
-                    <b>Hora:</b> ${agora.toLocaleTimeString()}<br>
-                    <b style="color:#10b981;">ASSINADO DIGITALMENTE</b>
+                    <b>Data:</b> ${dataH} ${horaH}<br>
+                    <span style="color:#10b981;">● AUTENTICADO</span>
                 </div>
             </div>
-            <div style="display:flex; gap:10px; margin-bottom:30px;">
-                <div style="flex:1; background:#f8fafc; padding:15px; border-radius:10px; border:1px solid #eee; text-align:center;">RECEITAS<br><b>${formatar(r)}</b></div>
-                <div style="flex:1; background:#f8fafc; padding:15px; border-radius:10px; border:1px solid #eee; text-align:center;">DESPESAS<br><b>${formatar(d)}</b></div>
+            <div style="display:flex; gap:10px; margin-bottom:25px;">
+                <div style="flex:1; background:#f8fafc; padding:15px; border-radius:10px; text-align:center; border:1px solid #eee;">RECEITAS<br><b style="color:#10b981;">${formatar(r)}</b></div>
+                <div style="flex:1; background:#f8fafc; padding:15px; border-radius:10px; text-align:center; border:1px solid #eee;">DESPESAS<br><b style="color:#ef4444;">${formatar(d)}</b></div>
                 <div style="flex:1; background:#0f172a; padding:15px; border-radius:10px; color:white; text-align:center;">SALDO<br><b>${formatar(r-d)}</b></div>
             </div>
-            <table style="width:100%; border-collapse:collapse; margin-bottom:40px;">
+            <table style="width:100%; border-collapse:collapse; font-size:12px;">
                 <thead style="background:#f1f5f9;"><tr><th style="padding:10px; text-align:left;">Descrição</th><th style="text-align:right; padding:10px;">Valor</th></tr></thead>
-                <tbody>${state.dados.map(i => `<tr><td style="padding:10px; border-bottom:1px solid #eee;">${i.descricao}</td><td style="text-align:right; padding:10px; font-weight:bold; color:${i.tipo==='renda'?'#10b981':'#ef4444'}">${formatar(i.valor)}</td></tr>`).join('')}</tbody>
+                <tbody>${state.dados.map(i => `<tr><td style="padding:8px; border-bottom:1px solid #eee;">${i.descricao}</td><td style="text-align:right; padding:8px; font-weight:bold; color:${i.tipo==='renda'?'#10b981':'#ef4444'}">${formatar(i.valor)}</td></tr>`).join('')}</tbody>
             </table>
-            <div style="display:flex; justify-content:space-between; align-items:flex-end; border-top:1px solid #eee; padding-top:20px;">
-                <div style="font-size:10px; color:#64748b;"><b>ID Autenticação:</b><br><span style="font-family:monospace; color:#0f172a;">${authID}</span></div>
-                <div style="text-align:center; border-top:1px solid #0f172a; width:180px; font-size:10px; padding-top:5px;">ASSINATURA DO SISTEMA</div>
+            <div style="margin-top:40px; padding-top:15px; border-top:1px solid #eee; display:flex; justify-content:space-between; align-items:flex-end;">
+                <div style="font-size:9px; color:#94a3b8;">ID: ${authID}<br>© 2026 FastStile Enterprise</div>
+                <div style="text-align:center; width:150px; border-top:1px solid #0f172a; font-size:9px; padding-top:5px;">ASSINATURA DIGITAL</div>
             </div>`;
 
-        html2pdf().set({ margin: 10, filename: `Relatorio_${authID}.pdf`, html2canvas: { scale: 3 }, jsPDF: { format: 'a4' } }).from(element).save();
+        const opt = {
+            margin: 10,
+            filename: `FastStile_${authID}.pdf`,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+
+        // Executa o download e limpa a memória
+        html2pdf().from(element).set(opt).save().then(() => {
+            mostrarToast("PDF Pronto!");
+        }).catch(err => {
+            console.error(err);
+            mostrarToast("Erro ao gerar PDF");
+        });
     };
 
     window.exportarBackup = () => {
         const b = new Blob([JSON.stringify(state.dados)], { type: "application/json" });
-        const a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = "backup.json"; a.click();
+        const a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = "faststile_backup.json"; a.click();
     };
     
     window.importarBackup = () => {
