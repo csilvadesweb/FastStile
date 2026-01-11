@@ -24,22 +24,18 @@
   let dados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
   let chart = null;
 
-  // ===== STORAGE =====
   function salvar() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
   }
 
-  // ===== TOAST =====
   function mostrarToast(msg) {
     toast.textContent = msg;
     toast.classList.add("show");
     setTimeout(() => toast.classList.remove("show"), 2500);
   }
 
-  // ===== ATUALIZAR UI =====
   function atualizar() {
     lista.innerHTML = "";
-
     let renda = 0;
     let despesa = 0;
 
@@ -50,10 +46,7 @@
         <strong class="${item.tipo}">R$ ${item.valor.toFixed(2)}</strong>
       `;
       lista.appendChild(li);
-
-      item.tipo === "renda"
-        ? renda += item.valor
-        : despesa += item.valor;
+      item.tipo === "renda" ? renda += item.valor : despesa += item.valor;
     });
 
     totalRendaEl.textContent = `R$ ${renda.toFixed(2)}`;
@@ -63,31 +56,23 @@
     atualizarGrafico(renda, despesa);
   }
 
-  // ===== ADICIONAR =====
   window.adicionar = function () {
     const descricao = descricaoInput.value.trim();
-    const valor = Number(valorInput.value);
-    const tipo = tipoSelect.value;
-
-    if (!descricao || valor <= 0) {
-      mostrarToast("Preencha corretamente");
+    const valor = parseFloat(valorInput.value);
+    if (!descricao || isNaN(valor) || valor <= 0) {
+      mostrarToast("Preencha os campos corretamente");
       return;
     }
-
-    dados.push({ descricao, valor, tipo });
+    dados.push({ descricao, valor, tipo: tipoSelect.value });
     salvar();
     atualizar();
-
     descricaoInput.value = "";
     valorInput.value = "";
-
-    mostrarToast("Registro salvo");
+    mostrarToast("Salvo com sucesso!");
   };
 
-  // ===== GRÁFICO =====
   function atualizarGrafico(renda, despesa) {
     if (chart) chart.destroy();
-
     chart = new Chart(graficoCanvas, {
       type: "doughnut",
       data: {
@@ -97,29 +82,17 @@
           backgroundColor: ["#2ecc71", "#e74c3c"]
         }]
       },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: {
-            position: "bottom"
-          }
-        }
-      }
+      options: { responsive: true }
     });
   }
 
-  // ===== PDF =====
   window.exportarPDF = function () {
-    html2pdf().from(document.body).save("FastStile.pdf");
+    const opt = { margin: 1, filename: 'FastStile.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' } };
+    html2pdf().set(opt).from(document.body).save();
   };
 
-  // ===== BACKUP =====
   window.exportarBackup = function () {
-    const blob = new Blob(
-      [JSON.stringify(dados)],
-      { type: "application/json" }
-    );
-
+    const blob = new Blob([JSON.stringify(dados)], { type: "application/json" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
     a.download = "faststile_backup.json";
@@ -130,54 +103,46 @@
     const input = document.createElement("input");
     input.type = "file";
     input.accept = ".json";
-
     input.onchange = e => {
       const reader = new FileReader();
       reader.onload = () => {
-        dados = JSON.parse(reader.result) || [];
-        salvar();
-        atualizar();
-        mostrarToast("Backup importado");
+        try {
+          dados = JSON.parse(reader.result);
+          salvar();
+          atualizar();
+          mostrarToast("Backup importado!");
+        } catch(err) { mostrarToast("Erro no arquivo"); }
       };
       reader.readAsText(e.target.files[0]);
     };
-
     input.click();
   };
 
-  // ===== CONVERSOR =====
   window.converterMoeda = function () {
-    const valor = Number(valorConverter.value);
-    const taxa = Number(moeda.value);
-
-    if (!valor || !taxa) return;
-
-    resultadoConversao.textContent =
-      `R$ ${(valor * taxa).toFixed(2)}`;
+    const valor = parseFloat(valorConverter.value);
+    const taxa = parseFloat(moeda.value);
+    if (isNaN(valor)) return;
+    resultadoConversao.textContent = `R$ ${(valor * taxa).toFixed(2)}`;
   };
 
-  // ===== RESET =====
   window.abrirModalReset = () => modalReset.style.display = "flex";
   window.fecharModalReset = () => modalReset.style.display = "none";
-
-  window.confirmarReset = function () {
+  window.confirmarReset = () => {
     dados = [];
     salvar();
     atualizar();
-
-    valorConverter.value = "";
-    resultadoConversao.textContent = "";
-
     fecharModalReset();
-    mostrarToast("Dados apagados");
+    mostrarToast("Dados zerados");
   };
 
-  // ===== INIT =====
   atualizar();
 
-  // ===== SERVICE WORKER =====
+  // Registro do Service Worker corrigido
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("./sw.js");
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("./sw.js")
+        .then(reg => console.log("SW OK"))
+        .catch(err => console.log("SW Erro", err));
+    });
   }
-
 })();
