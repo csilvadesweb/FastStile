@@ -2,11 +2,14 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <title>FastStile - Gestão Financeira Inteligente</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <meta name="author" content="C. Silva">
   <meta name="copyright" content="© 2026 FastStile. Todos os direitos reservados.">
   <meta name="theme-color" content="#0f172a" />
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+
+  <title>FastStile - Gestão Financeira Inteligente</title>
 
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="icons/icon-192.png" />
@@ -16,6 +19,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body oncontextmenu="return false;">
+
 <header>
   <button id="theme-toggle" onclick="toggleTheme()" aria-label="Alternar Tema">🌓</button>
   <div class="header-content">
@@ -23,15 +27,18 @@
     <span class="badge">Original & Seguro</span>
   </div>
 </header>
+
 <main>
   <section class="insight-card">
     <p id="dicaFinanceira">Iniciando ambiente seguro...</p>
   </section>
+
   <section class="cards">
     <div class="card income"><h3>Rendas</h3><p id="totalRenda">R$ 0,00</p></div>
     <div class="card expense"><h3>Despesas</h3><p id="totalDespesa">R$ 0,00</p></div>
     <div class="card balance"><h3>Saldo Atual</h3><p id="saldoTotal">R$ 0,00</p></div>
   </section>
+
   <section class="form-section">
     <div class="input-group">
       <input type="text" id="descricao" placeholder="Ex: Salário" autocomplete="off" />
@@ -45,24 +52,30 @@
       <button class="btn-main" onclick="adicionar()">Salvar Registro</button>
     </div>
   </section>
+
   <section class="chart-section">
     <canvas id="grafico"></canvas>
   </section>
+
   <section class="list-section">
     <h2>Fluxo de Caixa</h2>
     <ul id="lista"></ul>
   </section>
+
   <section class="actions">
     <button onclick="exportarPDF()" class="btn-pdf">PDF Premium</button>
     <button onclick="exportarBackup()">Backup</button>
     <button onclick="importarBackup()">Importar</button>
     <button class="danger" onclick="abrirModalReset()">Resetar</button>
   </section>
+
   <footer>
     <p>© 2026 FastStile - <a href="privacy.html">Termos & Privacidade</a></p>
   </footer>
 </main>
+
 <div id="toast"></div>
+
 <div id="modalPrivacidade" class="modal">
   <div class="modal-content">
     <h3>Termos & Privacidade</h3>
@@ -73,6 +86,7 @@
     <button class="btn-main" onclick="fecharPrivacidade()">Aceitar e Iniciar</button>
   </div>
 </div>
+
 <div id="modalReset" class="modal">
   <div class="modal-content">
     <h3>Zerar Tudo?</h3>
@@ -82,6 +96,7 @@
     </div>
   </div>
 </div>
+
 <script src="App.js"></script>
 <script src="script.js"></script>
 </body>
