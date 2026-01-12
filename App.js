@@ -1,0 +1,1 @@
+/* Conteúdo de App.js já enviado */
