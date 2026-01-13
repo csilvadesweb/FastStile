@@ -1,100 +1,81 @@
 <!DOCTYPE html>
-<html lang="pt-BR" data-theme="light">
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#0f172a">
-
-  <title>FastStile Financeiro</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FastStile Finance</title>
 
   <link rel="manifest" href="manifest.json">
-  <link rel="icon" href="icons/icon-192.png">
-  <link rel="stylesheet" href="style.css">
+  <meta name="theme-color" content="#0b2c3d">
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<header>
-  <div class="header-content">
-    <h1>FastStile</h1>
-    <p id="dicaFinanceira">Controle financeiro inteligente.</p>
-  </div>
+<header class="topo">
+  <h1>FastStile</h1>
+  <p>Organização financeira gera liberdade.</p>
 
-  <button id="theme-toggle" onclick="toggleTema()">🌙</button>
-
-  <button class="premium-btn" onclick="abrirLicenca()">⭐ Premium</button>
+  <button class="btn-premium" onclick="abrirLicenca()">
+    ⭐ Premium
+  </button>
 </header>
 
-<main>
+<main class="container">
 
-<section class="cards">
-  <div class="card">
-    <h3>Rendas</h3>
-    <p id="totalRenda">R$ 0,00</p>
-  </div>
+  <section class="cards">
+    <div class="card">
+      <h3>Rendas</h3>
+      <p id="totalRendas">R$ 0,00</p>
+    </div>
 
-  <div class="card">
-    <h3>Despesas</h3>
-    <p id="totalDespesa">R$ 0,00</p>
-  </div>
+    <div class="card">
+      <h3>Despesas</h3>
+      <p id="totalDespesas">R$ 0,00</p>
+    </div>
 
-  <div class="card destaque">
-    <h3>Saldo</h3>
-    <p id="saldoTotal">R$ 0,00</p>
-  </div>
-</section>
+    <div class="card destaque">
+      <h3>Saldo</h3>
+      <p id="saldo">R$ 0,00</p>
+    </div>
+  </section>
 
-<section class="form-section">
-  <input id="descricao" placeholder="Descrição (ex: Salário)">
-  <input id="valor" type="number" placeholder="Valor">
+  <section class="form">
+    <input type="text" id="descricao" placeholder="Descrição (ex: Salário)" />
+    <input type="number" id="valor" placeholder="Valor" />
 
-  <div class="input-group">
-    <button class="entrada" onclick="setTipo('renda')">+ Receita</button>
-    <button class="saida" onclick="setTipo('despesa')">- Despesa</button>
-  </div>
+    <div class="botoes">
+      <button class="receita" onclick="adicionarTransacao('receita')">+ Receita</button>
+      <button class="despesa" onclick="adicionarTransacao('despesa')">- Despesa</button>
+    </div>
 
-  <button class="btn-main" onclick="adicionar()">Adicionar</button>
-</section>
+    <button class="adicionar" onclick="salvarTransacao()">Adicionar</button>
+  </section>
 
-<section class="chart-section">
-  <canvas id="grafico"></canvas>
-</section>
-
-<section class="list-section">
-  <ul id="lista"></ul>
-</section>
-
-<section class="actions">
-  <button onclick="exportarPDF()">PDF 🔒</button>
-  <button onclick="exportarBackup()">Backup 🔒</button>
-  <button onclick="importarBackup()">Importar 🔒</button>
-  <button class="danger" onclick="resetar()">Limpar 🔒</button>
-</section>
-
-<footer>
-  <p>© FastStile Financeiro</p>
-  <a href="#" onclick="mostrarPolitica()">Política de Privacidade</a>
-</footer>
+  <section class="acoes">
+    <button onclick="gerarPDF()">PDF 🔒</button>
+    <button onclick="backup()">Backup 🔒</button>
+    <button onclick="importar()">Importar 🔒</button>
+    <button onclick="limparTudo()">Limpar 🔒</button>
+  </section>
 
 </main>
 
 <!-- MODAL LICENÇA -->
 <div id="modalLicenca" class="modal">
-  <div class="modal-content">
-    <h3>Ativar Licença Premium</h3>
-    <input id="chaveLicenca" placeholder="FS-2026-XXXX-XXXX">
-    <button class="btn-main" onclick="ativarLicenca()">Ativar</button>
-    <button onclick="fecharLicenca()">Cancelar</button>
+  <div class="modal-box">
+    <h2>Ativar Premium</h2>
+
+    <input type="text" id="chaveLicenca" placeholder="FS-2026-XXXX-XXXX">
+
+    <div class="modal-botoes">
+      <button onclick="ativarLicenca()">Ativar</button>
+      <button onclick="fecharLicenca()">Cancelar</button>
+    </div>
   </div>
 </div>
 
-<!-- TOAST -->
-<div id="toast"></div>
-
 <script src="script.js"></script>
-
 </body>
 </html>
