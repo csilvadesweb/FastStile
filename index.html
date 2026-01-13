@@ -6,83 +6,90 @@
   <title>FastStile Finance Pro</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0b2c3d">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body class="light-theme">
 
 <header class="topo">
-  <div class="header-actions">
-    <button id="theme-toggle" onclick="toggleTheme()" class="btn-icon">🌓</button>
-    <button class="btn-premium-toggle" onclick="abrirLicenca()" id="btnPremiumStatus">⭐ Ativar Premium</button>
-  </div>
-  <div class="header-content">
-    <h1>FastStile <span class="badge-pro">PRO</span></h1>
-    <p>Gestão Financeira Inteligente</p>
+  <div class="header-wrapper"> <div class="header-actions">
+      <button id="theme-toggle" onclick="toggleTheme()" class="btn-icon" title="Alternar Tema">🌓</button>
+      <button class="btn-premium-toggle" onclick="abrirLicenca()" id="btnPremiumStatus">⭐ Ativar Premium</button>
+    </div>
+    <div class="header-content">
+      <h1>FastStile <span class="badge-pro">PRO</span></h1>
+      <p>Gestão Financeira Inteligente</p>
+    </div>
   </div>
 </header>
 
 <main class="container">
-  <section class="card dashboard">
-    <div class="chart-container">
-      <canvas id="graficoFinanceiro"></canvas>
-      <div class="chart-center-text"><span id="saldoPercent">0%</span></div>
-    </div>
-    <div class="resumo-mini">
-      <div class="item-resumo">
-        <span class="dot receita"></span>
-        <div><small>Rendas</small><strong id="totalRendas">R$ 0,00</strong></div>
-      </div>
-      <div class="item-resumo">
-        <span class="dot despesa"></span>
-        <div><small>Despesas</small><strong id="totalDespesas">R$ 0,00</strong></div>
-      </div>
-      <div class="item-resumo total">
-        <div><small>Saldo Geral</small><strong id="saldoTotal">R$ 0,00</strong></div>
-      </div>
-    </div>
-  </section>
+  <div class="main-grid">
+    <div class="col-left">
+      <section class="card dashboard">
+        <div class="chart-container">
+          <canvas id="graficoFinanceiro"></canvas>
+          <div class="chart-center-text"><span id="saldoPercent">0%</span></div>
+        </div>
+        <div class="resumo-mini">
+          <div class="item-resumo">
+            <span class="dot receita"></span>
+            <div><small>Rendas</small><strong id="totalRendas">R$ 0,00</strong></div>
+          </div>
+          <div class="item-resumo">
+            <span class="dot despesa"></span>
+            <div><small>Despesas</small><strong id="totalDespesas">R$ 0,00</strong></div>
+          </div>
+          <div class="item-resumo total">
+            <div><small>Saldo Geral</small><strong id="saldoTotal">R$ 0,00</strong></div>
+          </div>
+        </div>
+      </section>
 
-  <section class="card formulario">
-    <h3>Novo Lançamento</h3>
-    <div class="input-group">
-      <input type="text" id="descricao" placeholder="Descrição (ex: Mercado)" />
-      <input type="number" id="valor" placeholder="0,00" step="0.01" />
+      <section class="card formulario">
+        <h3>Novo Lançamento</h3>
+        <div class="input-group">
+          <input type="text" id="descricao" placeholder="Descrição (ex: Mercado)" autocomplete="off" />
+          <input type="number" id="valor" placeholder="0,00" step="0.01" inputmode="decimal" />
+        </div>
+        <div class="botoes-tipo">
+          <button class="btn-tipo" onclick="setTipo('receita')" id="btnReceita">＋ Receita</button>
+          <button class="btn-tipo" onclick="setTipo('despesa')" id="btnDespesa">－ Despesa</button>
+        </div>
+        <button class="btn-adicionar" onclick="salvarTransacao()">Confirmar Lançamento</button>
+      </section>
     </div>
-    <div class="botoes-tipo">
-      <button class="btn-tipo" onclick="setTipo('receita')" id="btnReceita">＋ Receita</button>
-      <button class="btn-tipo" onclick="setTipo('despesa')" id="btnDespesa">－ Despesa</button>
-    </div>
-    <button class="btn-adicionar" onclick="salvarTransacao()">Confirmar Lançamento</button>
-  </section>
 
-  <section class="card extrato">
-    <div class="extrato-header">
-      <h3>Histórico</h3>
-      <div class="mini-converter">USD: R$ 5,20</div>
-    </div>
-    <ul id="listaTransacoes"></ul>
-  </section>
+    <div class="col-right">
+      <section class="card extrato">
+        <div class="extrato-header">
+          <h3>Histórico</h3>
+          <div id="miniConverter" class="mini-converter">USD: R$ 0,00</div>
+        </div>
+        <div class="lista-wrapper"> <ul id="listaTransacoes"></ul>
+        </div>
+      </section>
 
-  <section class="ferramentas-grid">
-    <button onclick="gerarPDF()" class="tool-card">
-      <span class="tool-icon">📄</span><span class="tool-label">PDF</span>
-    </button>
-    <button onclick="exportarBackup()" class="tool-card">
-      <span class="tool-icon">☁️</span><span class="tool-label">Backup</span>
-    </button>
-    <button onclick="document.getElementById('inputImportar').click()" class="tool-card">
-      <span class="tool-icon">📥</span><span class="tool-label">Importar</span>
-    </button>
-    <input type="file" id="inputImportar" style="display: none;" accept=".json" onchange="processarImportacao(event)">
-    <button onclick="abrirConfirmacao('limpar')" class="tool-card danger">
-      <span class="tool-icon">🗑️</span><span class="tool-label">Limpar</span>
-    </button>
-  </section>
+      <section class="ferramentas-grid">
+        <button onclick="gerarPDF()" class="tool-card">
+          <span class="tool-icon">📄</span><span class="tool-label">PDF</span>
+        </button>
+        <button onclick="exportarBackup()" class="tool-card">
+          <span class="tool-icon">☁️</span><span class="tool-label">Backup</span>
+        </button>
+        <button onclick="document.getElementById('inputImportar').click()" class="tool-card">
+          <span class="tool-icon">📥</span><span class="tool-label">Importar</span>
+        </button>
+        <input type="file" id="inputImportar" style="display: none;" accept=".json" onchange="processarImportacao(event)">
+        <button onclick="abrirConfirmacao('limpar')" class="tool-card danger">
+          <span class="tool-icon">🗑️</span><span class="tool-label">Limpar</span>
+        </button>
+      </section>
+    </div>
+  </div>
 </main>
 
-<!-- MODAL PREMIUM -->
 <div id="modalLicenca" class="modal">
   <div class="modal-content premium-box">
     <div class="premium-header">
@@ -100,7 +107,6 @@
   </div>
 </div>
 
-<!-- MODAL CONFIRMAÇÃO -->
 <div id="modalConfirmacao" class="modal">
   <div class="modal-content confirm-box">
     <div class="confirm-icon">⚠️</div>
@@ -113,9 +119,13 @@
   </div>
 </div>
 
-<!-- TOAST -->
 <div id="toast"></div>
 
 <script src="script.js"></script>
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js');
+  }
+</script>
 </body>
 </html>
