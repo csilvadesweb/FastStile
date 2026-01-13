@@ -13,7 +13,7 @@
 </head>
 <body class="light-theme">
 
-<header class="topo">
+<header class="topo no-print">
   <div class="header-wrapper">
     <div class="header-actions">
       <button onclick="toggleTheme()" class="btn-icon">🌓</button>
@@ -27,21 +27,31 @@
 </header>
 
 <main class="container">
-  <section class="card dashboard" id="section-print">
-    <div class="chart-container">
-      <canvas id="graficoFinanceiro"></canvas>
-      <div class="chart-center-text" id="saldoPercent">0%</div>
-    </div>
-    <div class="resumo-mini">
-      <div class="item-resumo"><span>Rendas</span><strong id="totalRendas" class="text-success">R$ 0,00</strong></div>
-      <div class="item-resumo"><span>Gastos</span><strong id="totalDespesas" class="text-danger">R$ 0,00</strong></div>
-      <div class="item-resumo total-line"><span>Saldo</span><strong id="saldoTotal">R$ 0,00</strong></div>
-    </div>
-  </section>
+  <div id="area-extrato-banco">
+    <section class="card dashboard">
+      <div class="chart-container no-print">
+        <canvas id="graficoFinanceiro"></canvas>
+        <div class="chart-center-text" id="saldoPercent">0%</div>
+      </div>
+      <div class="resumo-mini">
+        <div class="item-resumo"><span>Rendas</span><strong id="totalRendas" style="color:var(--accent)">R$ 0,00</strong></div>
+        <div class="item-resumo"><span>Gastos</span><strong id="totalDespesas" style="color:var(--danger)">R$ 0,00</strong></div>
+        <div class="item-resumo total-line"><span>Saldo Total</span><strong id="saldoTotal">R$ 0,00</strong></div>
+      </div>
+    </section>
+
+    <section class="card extrato">
+      <div class="extrato-header">
+        <h3>Histórico de Atividades</h3>
+        <small id="miniConverter" class="no-print">Sincronizando...</small>
+      </div>
+      <ul id="listaTransacoes"></ul>
+    </section>
+  </div>
 
   <section class="card formulario no-print">
     <div class="input-group">
-      <input type="text" id="descricao" placeholder="Descrição (ex: Salário)" />
+      <input type="text" id="descricao" placeholder="Descrição" />
       <input type="number" id="valor" placeholder="0,00" inputmode="decimal" />
     </div>
     <div class="botoes-tipo">
@@ -51,48 +61,47 @@
     <button class="btn-adicionar" onclick="salvarTransacao()">Confirmar Lançamento</button>
   </section>
 
-  <section class="card extrato">
-    <div class="extrato-header">
-      <h3>Atividades</h3>
-      <small id="miniConverter">Sincronizando câmbio...</small>
-    </div>
-    <ul id="listaTransacoes"></ul>
-    <footer class="footer-app"><a href="privacy.html">Política de Privacidade</a><p>© 2026 FastStile Pro</p></footer>
-  </section>
-
   <div class="ferramentas-grid no-print">
-    <button onclick="gerarPDF()" class="tool-card">📄 Relatório PDF</button>
-    <button onclick="abrirConfirmacao('limpar')" class="tool-card danger">🗑️ Resetar App</button>
+    <button onclick="gerarPDF()" class="tool-card">📄 Exportar PDF</button>
+    <button onclick="exportarBackup()" class="tool-card">☁️ Salvar Backup</button>
+    <button onclick="document.getElementById('inputImportar').click()" class="tool-card">📥 Importar</button>
+    <button onclick="abrirConfirmacao('limpar')" class="tool-card" style="color:var(--danger)">🗑️ Limpar Tudo</button>
+    <input type="file" id="inputImportar" style="display: none;" onchange="processarImportacao(event)">
   </div>
+  
+  <footer class="footer-app no-print">
+    <a href="privacy.html">Política de Privacidade</a>
+    <p>© 2026 FastStile Pro</p>
+  </footer>
 </main>
 
 <div id="modalLicenca" class="modal">
   <div class="modal-content">
-    <span class="premium-icon">💎</span>
+    <span style="font-size:50px">💎</span>
     <h2>Ativar Versão PRO</h2>
-    <p>Insira sua chave FS-2026 para liberar relatórios e backups.</p>
-    <input type="text" id="chaveLicenca" placeholder="FS-2026-XXXX-XXXX">
+    <input type="text" id="chaveLicenca" placeholder="FS-2026-XXXX-XXXX" style="margin: 20px 0; text-align: center;">
     <button class="btn-adicionar" onclick="ativarLicenca()">Validar Chave</button>
-    <button class="btn-link" onclick="fecharLicenca()">Voltar</button>
+    <button onclick="fecharLicenca()" class="btn-back">Voltar</button>
   </div>
 </div>
 
 <div id="modalConfirmacao" class="modal">
     <div class="modal-content">
-      <h2>Atenção</h2>
-      <p>Deseja limpar todos os dados do dispositivo?</p>
-      <div class="confirm-btns">
-        <button id="btnConfirmarAcao" class="btn-danger-action">Sim, apagar</button>
-        <button onclick="fecharConfirmacao()" class="btn-link">Cancelar</button>
+      <h2>Atenção!</h2>
+      <p>Deseja realmente apagar todos os dados?</p>
+      <div style="display:flex; gap:10px; margin-top:20px">
+        <button id="btnConfirmarAcao" style="flex:1; padding:15px; background:var(--danger); color:white; border:none; border-radius:12px; font-weight:700;">Sim, Apagar</button>
+        <button onclick="fecharConfirmacao()" style="flex:1; padding:15px; border:1px solid var(--border); background:none; border-radius:12px;">Cancelar</button>
       </div>
     </div>
 </div>
 
 <div id="toast"></div>
+
 <script src="script.js"></script>
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js');
+    window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js'); });
   }
 </script>
 </body>
