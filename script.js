@@ -5,26 +5,39 @@ let transacoes = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 let tipoSelecionado = null;
 let meuGrafico = null;
 
-// Inicialização
 document.addEventListener("DOMContentLoaded", () => {
+    initTheme();
     render();
     verificarStatusPremium();
 });
 
-// Controle de Tipo
+// --- SISTEMA DE TEMAS ---
+function initTheme() {
+    const savedTheme = localStorage.getItem("theme") || "light-theme";
+    document.body.className = savedTheme;
+}
+
+function toggleTheme() {
+    const isDark = document.body.classList.contains("dark-theme");
+    const newTheme = isDark ? "light-theme" : "dark-theme";
+    document.body.className = newTheme;
+    localStorage.setItem("theme", newTheme);
+    render(); // Re-renderiza para atualizar cores do gráfico se necessário
+}
+
+// --- CORE TRANSAÇÕES ---
 function setTipo(tipo) {
     tipoSelecionado = tipo;
     document.getElementById('btnReceita').className = 'btn-tipo' + (tipo === 'receita' ? ' active-receita' : '');
     document.getElementById('btnDespesa').className = 'btn-tipo' + (tipo === 'despesa' ? ' active-despesa' : '');
 }
 
-// Salvar Lançamento
 function salvarTransacao() {
     const desc = document.getElementById("descricao").value.trim();
     const valor = parseFloat(document.getElementById("valor").value);
 
     if (!desc || isNaN(valor) || !tipoSelecionado) {
-        mostrarToast("Preencha os campos e selecione o tipo.");
+        mostrarToast("Preencha os campos corretamente.");
         return;
     }
 
@@ -38,11 +51,11 @@ function salvarTransacao() {
 
     salvarEAtualizar();
     limparCampos();
-    mostrarToast("Lançamento confirmado!");
+    mostrarToast("Confirmado!");
 }
 
 function deletarTransacao(id) {
-    if(confirm("Excluir esta transação?")) {
+    if(confirm("Excluir item?")) {
         transacoes = transacoes.filter(t => t.id !== id);
         salvarEAtualizar();
     }
@@ -53,7 +66,6 @@ function salvarEAtualizar() {
     render();
 }
 
-// Renderização Principal
 function render() {
     const lista = document.getElementById("listaTransacoes");
     lista.innerHTML = "";
@@ -67,7 +79,7 @@ function render() {
         li.innerHTML = `
             <div>
                 <strong>${t.desc}</strong>
-                <small style="display:block; color:#9ca3af; font-size:10px">${t.data}</small>
+                <small style="display:block; color:var(--text-sub); font-size:10px">${t.data}</small>
             </div>
             <div style="display:flex; align-items:center">
                 <span class="${t.tipo === 'receita' ? 'texto-receita' : 'texto-despesa'}">
@@ -89,14 +101,17 @@ function formatarMoeda(v) {
     return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
-// Gráfico com Lógica de Estado Vazio
+// --- GRÁFICO ---
 function atualizarGrafico(r, d) {
     const ctx = document.getElementById('graficoFinanceiro');
     if (meuGrafico) meuGrafico.destroy();
     
+    const isDark = document.body.classList.contains("dark-theme");
+    const emptyColor = isDark ? '#334155' : '#e5e7eb';
+    
     const temDados = r > 0 || d > 0;
     const dataGrafico = temDados ? [r, d] : [1, 0];
-    const cores = temDados ? ['#10b981', '#ef4444'] : ['#e5e7eb', '#f3f4f6'];
+    const cores = temDados ? ['#10b981', '#ef4444'] : [emptyColor, emptyColor];
 
     meuGrafico = new Chart(ctx, {
         type: 'doughnut',
@@ -112,15 +127,12 @@ function atualizarGrafico(r, d) {
         options: { 
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { 
-                legend: { display: false },
-                tooltip: { enabled: temDados }
-            } 
+            plugins: { legend: { display: false }, tooltip: { enabled: temDados } }
         }
     });
 }
 
-// Utilitários e Premium
+// --- UTILITÁRIOS PREMIUM ---
 function mostrarToast(m) {
     const t = document.getElementById("toast");
     t.innerText = m; t.style.display = "block";
@@ -140,7 +152,7 @@ function isPremium() { return localStorage.getItem("faststile_premium") === "tru
 function verificarStatusPremium() {
     if(isPremium()) {
         const btn = document.getElementById("btnPremiumStatus");
-        btn.innerHTML = "💎 Premium Ativo";
+        btn.innerHTML = "💎 PRO";
         btn.style.background = "#10b981";
         btn.onclick = null;
     }
@@ -154,7 +166,7 @@ function ativarLicenca() {
     if (/^FS-2026-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(chave)) {
         localStorage.setItem("faststile_premium", "true");
         location.reload();
-    } else { alert("Chave inválida! Use o padrão FS-2026-XXXX-XXXX"); }
+    } else { alert("Chave inválida!"); }
 }
 
 function gerarPDF() {
@@ -168,18 +180,12 @@ function exportarBackup() {
     const blob = new Blob([data], {type: 'application/json'});
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url; a.download = 'faststile_backup.json'; a.click();
-}
-
-function importarBackup() {
-    if (!isPremium()) return abrirLicenca();
-    mostrarToast("Clique para selecionar arquivo de backup.");
+    a.href = url; a.download = 'backup.json'; a.click();
 }
 
 function limparTudo() {
-    if (confirm("Deseja apagar todos os lançamentos? Esta ação é irreversível.")) {
+    if (confirm("Apagar tudo?")) {
         transacoes = [];
         salvarEAtualizar();
-        mostrarToast("Dados removidos.");
     }
 }
