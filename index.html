@@ -6,8 +6,8 @@
   <title>FastStile Finance Pro</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0b2c3d">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
@@ -15,7 +15,7 @@
 <header class="topo">
   <div class="header-content">
     <h1>FastStile <span class="badge-pro">PRO</span></h1>
-    <p>Gestão Financeira Inteligente</p>
+    <p>Sua soberania financeira</p>
   </div>
   <button class="btn-premium-toggle" onclick="abrirLicenca()" id="btnPremiumStatus">
     ⭐ Ativar Premium
@@ -24,61 +24,62 @@
 
 <main class="container">
   <section class="resumo">
-    <div class="card">
+    <div class="card-mini">
       <span>Rendas</span>
       <strong id="totalRendas" class="texto-receita">R$ 0,00</strong>
     </div>
-    <div class="card">
+    <div class="card-mini">
       <span>Despesas</span>
       <strong id="totalDespesas" class="texto-despesa">R$ 0,00</strong>
     </div>
-    <div class="card destaque">
-      <span>Saldo Geral</span>
+    <div class="card-mini destaque">
+      <span>Saldo</span>
       <strong id="saldoTotal">R$ 0,00</strong>
     </div>
   </section>
 
-  <section class="chart-container card">
+  <section class="card chart-box">
     <canvas id="graficoFinanceiro"></canvas>
   </section>
 
-  <section class="formulario">
-    <h3>Nova Transação</h3>
-    <input type="text" id="descricao" placeholder="Descrição (ex: Aluguel)" />
-    <input type="number" id="valor" placeholder="Valor (0,00)" step="0.01" />
+  <section class="card formulario">
+    <h3>Novo Lançamento</h3>
+    <div class="input-group">
+      <input type="text" id="descricao" placeholder="Descrição" />
+      <input type="number" id="valor" placeholder="Valor (R$)" step="0.01" />
+    </div>
     
     <div class="botoes-tipo">
-      <button type="button" class="btn-tipo receita" onclick="setTipo('receita')" id="btnReceita">+ Receita</button>
-      <button type="button" class="btn-tipo despesa" onclick="setTipo('despesa')" id="btnDespesa">- Despesa</button>
+      <button class="btn-tipo" onclick="setTipo('receita')" id="btnReceita">＋ Receita</button>
+      <button class="btn-tipo" onclick="setTipo('despesa')" id="btnDespesa">－ Despesa</button>
     </div>
 
-    <button class="btn-adicionar" onclick="salvarTransacao()">Confirmar Lançamento</button>
+    <button class="btn-adicionar" onclick="salvarTransacao()">Confirmar</button>
   </section>
 
-  <section class="extrato card">
-    <h3>Histórico Recente</h3>
+  <section class="card extrato">
+    <div class="extrato-header">
+      <h3>Histórico</h3>
+      <div id="moedaConversor" class="mini-converter">USD: R$ 5,20</div>
+    </div>
     <ul id="listaTransacoes"></ul>
   </section>
 
-  <section class="ferramentas">
-    <div class="grid-tools">
-      <button onclick="gerarPDF()" class="tool-btn"><i class="icon">📄</i> PDF</button>
-      <button onclick="exportarBackup()" class="tool-btn"><i class="icon">☁️</i> Backup</button>
-      <button onclick="importarBackup()" class="tool-btn"><i class="icon">📥</i> Importar</button>
-      <button onclick="limparTudo()" class="tool-btn danger"><i class="icon">🗑️</i> Limpar</button>
-    </div>
+  <section class="ferramentas-grid">
+    <button onclick="gerarPDF()" class="btn-tool">📄 PDF</button>
+    <button onclick="exportarBackup()" class="btn-tool">☁️ Backup</button>
+    <button onclick="importarBackup()" class="btn-tool">📥 Importar</button>
+    <button onclick="limparTudo()" class="btn-tool danger">🗑️ Limpar</button>
   </section>
 </main>
 
 <div id="modalLicenca" class="modal">
   <div class="modal-content">
-    <h2>Upgrade Premium</h2>
-    <p>Libere backup na nuvem, exportação em PDF e conversor de moedas ilimitado.</p>
+    <h2>Ativar Licença PRO</h2>
+    <p>Insira sua chave para liberar funções de exportação e backup.</p>
     <input type="text" id="chaveLicenca" placeholder="FS-2026-XXXX-XXXX">
-    <div class="modal-actions">
-      <button class="btn-confirmar" onclick="ativarLicenca()">Ativar Agora</button>
-      <button class="btn-cancelar" onclick="fecharLicenca()">Depois</button>
-    </div>
+    <button class="btn-confirmar" onclick="ativarLicenca()">Validar Chave</button>
+    <button class="btn-cancelar" onclick="fecharLicenca()">Voltar</button>
   </div>
 </div>
 
