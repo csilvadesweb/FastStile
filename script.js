@@ -1,14 +1,14 @@
 "use strict";
 
-const STORAGE_KEY = "FastStile_Pro_Core_v2";
-const PREMIUM_KEY = "FastStile_Premium_Status";
-let transacoes = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+const DB_KEY = "FastStile_Core_Data_v2026";
+const PRO_KEY = "FastStile_Premium_Status";
+let transacoes = JSON.parse(localStorage.getItem(DB_KEY)) || [];
 let tipoSelecionado = null;
 let meuGrafico = null;
 
 document.addEventListener("DOMContentLoaded", () => {
     document.body.className = localStorage.getItem("theme") || "light-theme";
-    if(localStorage.getItem(PREMIUM_KEY) === "true") validarPremiumUI();
+    if(localStorage.getItem(PRO_KEY) === "true") validarPremiumUI();
     fetchCambio();
     render();
 });
@@ -32,12 +32,12 @@ function salvarTransacao() {
     if (!desc || isNaN(valor) || !tipoSelecionado) { toast("Preencha todos os campos."); return; }
 
     transacoes.unshift({ id: Date.now(), desc, valor, tipo: tipoSelecionado, data: new Date().toLocaleDateString('pt-BR') });
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(transacoes));
+    localStorage.setItem(DB_KEY, JSON.stringify(transacoes));
     document.getElementById("descricao").value = "";
     document.getElementById("valor").value = "";
     setTipo(null);
     render();
-    toast("Lançamento registado!");
+    toast("Lançamento salvo!");
 }
 
 function render() {
@@ -53,7 +53,7 @@ function render() {
             <div style="display:flex; align-items:center; gap:12px">
             <span style="font-weight:800; color:${t.tipo==='receita'?'var(--accent)':'var(--danger)'}">
             ${t.tipo==='receita'?'+':'-'} ${t.valor.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}</span>
-            <button class="no-print" onclick="removerItem(${t.id})" style="border:none; background:none; color:var(--text-sub); cursor:pointer;">✕</button></div>`;
+            <button class="no-print" onclick="removerItem(${t.id})" style="border:none; background:none; cursor:pointer;">✕</button></div>`;
         lista.appendChild(li);
     });
 
@@ -75,9 +75,9 @@ function atualizarGrafico(r, d) {
 }
 
 function exportarBackup() {
-    if (localStorage.getItem(PREMIUM_KEY) !== "true") { abrirLicenca(); return; }
+    if (localStorage.getItem(PRO_KEY) !== "true") { abrirLicenca(); return; }
     const blob = new Blob([JSON.stringify(transacoes)], {type: 'application/json'});
-    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'faststile_backup.json'; a.click();
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'backup_faststile.json'; a.click();
 }
 
 function processarImportacao(event) {
@@ -85,16 +85,16 @@ function processarImportacao(event) {
     reader.onload = (e) => {
         try {
             transacoes = JSON.parse(e.target.result);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(transacoes));
-            render(); toast("Dados importados!");
-        } catch { toast("Erro no ficheiro!"); }
+            localStorage.setItem(DB_KEY, JSON.stringify(transacoes));
+            render(); toast("Backup restaurado!");
+        } catch { toast("Erro no arquivo!"); }
     };
     reader.readAsText(event.target.files[0]);
 }
 
 function gerarPDF() {
-    if (localStorage.getItem(PREMIUM_KEY) !== "true") { abrirLicenca(); return; }
-    const element = document.getElementById("area-extrato-banco");
+    if (localStorage.getItem(PRO_KEY) !== "true") { abrirLicenca(); return; }
+    const element = document.getElementById("area-pdf-banco");
     const opt = { margin: 10, filename: 'extrato_faststile.pdf', html2canvas: { scale: 3 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } };
     toast("A gerar PDF executivo...");
     html2pdf().set(opt).from(element).save();
@@ -103,16 +103,16 @@ function gerarPDF() {
 function ativarLicenca() {
     const chave = document.getElementById("chaveLicenca").value.toUpperCase().trim();
     if (/^FS-2026-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(chave)) {
-        localStorage.setItem(PREMIUM_KEY, "true");
-        toast("💎 Premium Ativado!"); setTimeout(() => location.reload(), 1000);
+        localStorage.setItem(PRO_KEY, "true");
+        toast("Premium Ativado!"); setTimeout(() => location.reload(), 1000);
     } else { toast("Chave inválida!"); }
 }
 
-function removerItem(id) { transacoes = transacoes.filter(t => t.id !== id); localStorage.setItem(STORAGE_KEY, JSON.stringify(transacoes)); render(); }
+function removerItem(id) { transacoes = transacoes.filter(t => t.id !== id); localStorage.setItem(DB_KEY, JSON.stringify(transacoes)); render(); }
 function abrirLicenca() { document.getElementById("modalLicenca").style.display = "flex"; }
 function fecharLicenca() { document.getElementById("modalLicenca").style.display = "none"; }
 function toast(m) { const t = document.getElementById("toast"); t.innerText = m; t.style.display = "block"; setTimeout(()=>t.style.display="none",3000); }
-function abrirConfirmacao() { document.getElementById("modalConfirmacao").style.display = "flex"; document.getElementById("btnConfirmarAcao").onclick = () => { transacoes = []; localStorage.setItem(STORAGE_KEY, "[]"); render(); fecharConfirmacao(); }; }
+function abrirConfirmacao() { document.getElementById("modalConfirmacao").style.display = "flex"; document.getElementById("btnConfirmarAcao").onclick = () => { transacoes = []; localStorage.setItem(DB_KEY, "[]"); render(); fecharConfirmacao(); }; }
 function fecharConfirmacao() { document.getElementById("modalConfirmacao").style.display = "none"; }
 async function fetchCambio() { try { const res = await fetch("https://economia.awesomeapi.com.br/last/USD-BRL"); const data = await res.json(); document.getElementById("miniConverter").innerHTML = `💵 USD <strong>R$ ${parseFloat(data.USDBRL.bid).toFixed(2)}</strong>`; } catch { } }
 function validarPremiumUI() { const b = document.getElementById("btnPremiumStatus"); b.innerText = "💎 Plano PRO"; b.style.background = "#1e293b"; b.style.color = "#fff"; }
