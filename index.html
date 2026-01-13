@@ -13,7 +13,8 @@
 <body class="light-theme">
 
 <header class="topo">
-  <div class="header-wrapper"> <div class="header-actions">
+  <div class="header-wrapper">
+    <div class="header-actions">
       <button id="theme-toggle" onclick="toggleTheme()" class="btn-icon" title="Alternar Tema">🌓</button>
       <button class="btn-premium-toggle" onclick="abrirLicenca()" id="btnPremiumStatus">⭐ Ativar Premium</button>
     </div>
@@ -67,7 +68,8 @@
           <h3>Histórico</h3>
           <div id="miniConverter" class="mini-converter">USD: R$ 0,00</div>
         </div>
-        <div class="lista-wrapper"> <ul id="listaTransacoes"></ul>
+        <div class="lista-wrapper">
+          <ul id="listaTransacoes"></ul>
         </div>
       </section>
 
@@ -90,6 +92,7 @@
   </div>
 </main>
 
+<!-- MODAL LICENÇA PREMIUM -->
 <div id="modalLicenca" class="modal">
   <div class="modal-content premium-box">
     <div class="premium-header">
@@ -107,6 +110,7 @@
   </div>
 </div>
 
+<!-- MODAL CONFIRMAÇÃO -->
 <div id="modalConfirmacao" class="modal">
   <div class="modal-content confirm-box">
     <div class="confirm-icon">⚠️</div>
@@ -119,7 +123,27 @@
   </div>
 </div>
 
+<!-- MODAL POLÍTICA DE PRIVACIDADE -->
+<div id="modalPrivacidade" class="modal">
+  <div class="modal-content">
+    <h2>Política de Privacidade</h2>
+    <p>
+      Este aplicativo coleta apenas dados locais do seu dispositivo para controle financeiro.
+      Nenhuma informação é enviada a servidores externos sem consentimento. 
+      Para dúvidas ou contato, envie e-mail para: 
+      <a href="mailto:csdesweb@gmail.com">csdesweb@gmail.com</a>
+    </p>
+    <button onclick="fecharPrivacidade()" class="btn-close-modal">Fechar</button>
+  </div>
+</div>
+
 <div id="toast"></div>
+
+<footer>
+  <p>
+    <a href="javascript:void(0)" onclick="abrirPrivacidade()">Política de Privacidade</a>
+  </p>
+</footer>
 
 <script src="script.js"></script>
 <script>
