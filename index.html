@@ -24,34 +24,22 @@
 </header>
 
 <main class="container">
-  
   <section class="card dashboard">
     <div class="chart-container">
       <canvas id="graficoFinanceiro"></canvas>
-      <div class="chart-center-text">
-        <span id="saldoPercent">0%</span>
-      </div>
+      <div class="chart-center-text"><span id="saldoPercent">0%</span></div>
     </div>
     <div class="resumo-mini">
       <div class="item-resumo">
         <span class="dot receita"></span>
-        <div>
-          <small>Rendas</small>
-          <strong id="totalRendas">R$ 0,00</strong>
-        </div>
+        <div><small>Rendas</small><strong id="totalRendas">R$ 0,00</strong></div>
       </div>
       <div class="item-resumo">
         <span class="dot despesa"></span>
-        <div>
-          <small>Despesas</small>
-          <strong id="totalDespesas">R$ 0,00</strong>
-        </div>
+        <div><small>Despesas</small><strong id="totalDespesas">R$ 0,00</strong></div>
       </div>
       <div class="item-resumo total">
-        <div>
-          <small>Saldo Geral</small>
-          <strong id="saldoTotal">R$ 0,00</strong>
-        </div>
+        <div><small>Saldo Geral</small><strong id="saldoTotal">R$ 0,00</strong></div>
       </div>
     </div>
   </section>
@@ -79,23 +67,17 @@
 
   <section class="ferramentas-grid">
     <button onclick="gerarPDF()" class="tool-card">
-      <span class="tool-icon">📄</span>
-      <span class="tool-label">PDF</span>
+      <span class="tool-icon">📄</span><span class="tool-label">PDF</span>
     </button>
     <button onclick="exportarBackup()" class="tool-card">
-      <span class="tool-icon">☁️</span>
-      <span class="tool-label">Backup</span>
+      <span class="tool-icon">☁️</span><span class="tool-label">Backup</span>
     </button>
-    
     <button onclick="document.getElementById('inputImportar').click()" class="tool-card">
-      <span class="tool-icon">📥</span>
-      <span class="tool-label">Importar</span>
+      <span class="tool-icon">📥</span><span class="tool-label">Importar</span>
     </button>
     <input type="file" id="inputImportar" style="display: none;" accept=".json" onchange="processarImportacao(event)">
-
-    <button onclick="limparTudo()" class="tool-card danger">
-      <span class="tool-icon">🗑️</span>
-      <span class="tool-label">Limpar</span>
+    <button onclick="abrirConfirmacao('limpar')" class="tool-card danger">
+      <span class="tool-icon">🗑️</span><span class="tool-label">Limpar</span>
     </button>
   </section>
 </main>
@@ -116,6 +98,18 @@
     <div class="modal-btn-stack">
       <button class="btn-activate-pro" onclick="ativarLicenca()">Validar Chave</button>
       <button class="btn-close-modal" onclick="fecharLicenca()">Voltar</button>
+    </div>
+  </div>
+</div>
+
+<div id="modalConfirmacao" class="modal">
+  <div class="modal-content confirm-box">
+    <div class="confirm-icon">⚠️</div>
+    <h2 id="confirmTitle">FastStile diz:</h2>
+    <p id="confirmMessage">Deseja realizar esta ação?</p>
+    <div class="confirm-actions">
+      <button id="btnConfirmarAcao" class="btn-confirm-yes">Confirmar</button>
+      <button onclick="fecharConfirmacao()" class="btn-confirm-no">Cancelar</button>
     </div>
   </div>
 </div>
