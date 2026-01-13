@@ -1,11 +1,5 @@
-const CACHE_NAME = 'faststile-v3';
-const ASSETS = [
-  './',
-  './index.html',
-  './style.css',
-  './script.js',
-  './manifest.json'
-];
+const CACHE_NAME = 'faststile-pro-v2026';
+const ASSETS = ['./', './index.html', './style.css', './script.js', './manifest.json', './privacy.html'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS)));
