@@ -87,7 +87,6 @@ function render() {
     document.getElementById("totalDespesas").innerText = formatarMoeda(d);
     document.getElementById("saldoTotal").innerText = formatarMoeda(saldo);
     
-    // Cálculo de Porcentagem para o centro do gráfico
     const total = r + d;
     const perc = total > 0 ? Math.round((r / total) * 100) : 0;
     document.getElementById("saldoPercent").innerText = perc + "%";
@@ -102,7 +101,6 @@ function formatarMoeda(v) {
 function atualizarGrafico(r, d) {
     const ctx = document.getElementById('graficoFinanceiro');
     if (meuGrafico) meuGrafico.destroy();
-    
     const isDark = document.body.classList.contains("dark-theme");
     const emptyColor = isDark ? '#334155' : '#e2e8f0';
     const temDados = r > 0 || d > 0;
@@ -113,17 +111,59 @@ function atualizarGrafico(r, d) {
             datasets: [{
                 data: temDados ? [r, d] : [1, 0],
                 backgroundColor: temDados ? ['#10b981', '#ef4444'] : [emptyColor, emptyColor],
-                borderWidth: 0, 
-                cutout: '85%', 
-                borderRadius: 20
+                borderWidth: 0, cutout: '85%', borderRadius: 20
             }]
         },
-        options: { 
-            responsive: true, 
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false }, tooltip: { enabled: false } }
-        }
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: false } } }
     });
+}
+
+// --- FUNÇÃO DE BACKUP CORRIGIDA ---
+function exportarBackup() {
+    if (localStorage.getItem("faststile_premium") !== "true") return abrirLicenca();
+    
+    if (transacoes.length === 0) {
+        mostrarToast("Não há dados para exportar.");
+        return;
+    }
+
+    const dataStr = JSON.stringify(transacoes, null, 2);
+    const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+    
+    const exportFileDefaultName = 'backup_faststile_' + new Date().toISOString().slice(0,10) + '.json';
+
+    const linkElement = document.createElement('a');
+    linkElement.setAttribute('href', dataUri);
+    linkElement.setAttribute('download', exportFileDefaultName);
+    linkElement.click();
+    mostrarToast("Backup gerado!");
+}
+
+// --- FUNÇÃO DE IMPORTAÇÃO DIRETO DOS ARQUIVOS ---
+function processarImportacao(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const importados = JSON.parse(e.target.result);
+            if (Array.isArray(importados)) {
+                if (confirm("Deseja substituir seus dados atuais pelos dados do arquivo?")) {
+                    transacoes = importados;
+                    salvarEAtualizar();
+                    mostrarToast("Dados importados com sucesso!");
+                }
+            } else {
+                alert("O arquivo não parece ser um backup válido do FastStile.");
+            }
+        } catch (err) {
+            alert("Erro ao ler o arquivo. Certifique-se de que é um arquivo .json");
+        }
+    };
+    reader.readAsText(file);
+    // Limpa o input para permitir importar o mesmo arquivo de novo se necessário
+    event.target.value = '';
 }
 
 function deletarTransacao(id) {
@@ -147,7 +187,6 @@ function limparCampos() {
     document.getElementById('btnDespesa').className = 'btn-tipo';
 }
 
-// PREMIUM
 function verificarStatusPremium() {
     if(localStorage.getItem("faststile_premium") === "true") {
         const btn = document.getElementById("btnPremiumStatus");
@@ -165,10 +204,14 @@ function ativarLicenca() {
     if (/^FS-2026-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(chave)) {
         localStorage.setItem("faststile_premium", "true");
         location.reload();
-    } else {
-        alert("Chave inválida!");
-    }
+    } else { alert("Chave inválida!"); }
 }
 
 function gerarPDF() { if (localStorage.getItem("faststile_premium") !== "true") return abrirLicenca(); window.print(); }
-function limparTudo() { if (confirm("Apagar tudo?")) { transacoes = []; salvarEAtualizar(); } }
+
+function limparTudo() { 
+    if (confirm("Apagar todos os dados permanentemente?")) { 
+        transacoes = []; 
+        salvarEAtualizar(); 
+    } 
+}
