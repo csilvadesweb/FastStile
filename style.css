@@ -1,241 +1,117 @@
 :root {
   --primary: #0b2c3d;
+  --primary-light: #164a66;
   --accent: #10b981;
   --danger: #ef4444;
-  --bg: #f4f6f8;
+  --bg: #f8fafc;
   --card-bg: #ffffff;
-  --text-main: #1e293b;
+  --text-main: #0f172a;
   --text-sub: #64748b;
   --border: #e2e8f0;
-  --radius: 18px;
+  --radius-lg: 24px;
+  --radius-md: 16px;
+  --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
 }
 
-/* =========================
-   BASE
-========================= */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: "Inter", system-ui, -apple-system, sans-serif;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
 
-body {
-  background: var(--bg);
-  color: var(--text-main);
-  min-height: 100vh;
-}
+body { background: var(--bg); color: var(--text-main); line-height: 1.6; }
 
-/* =========================
-   TOAST
-========================= */
-#toast {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--primary);
-  color: #fff;
-  padding: 12px 18px;
-  border-radius: 25px;
-  font-size: 14px;
-  opacity: 0;
-  transition: 0.3s;
-  z-index: 3000;
-}
-
-#toast.show {
-  opacity: 1;
-}
-
-/* =========================
-   HEADER
-========================= */
-header {
-  background: linear-gradient(135deg, #0b2c3d, #123f57);
-  color: #fff;
-  padding: 45px 20px 65px;
+/* Header Premium */
+.topo {
+  background: linear-gradient(135deg, var(--primary) 0%, #1e293b 100%);
+  color: white;
+  padding: 60px 20px 80px;
   text-align: center;
-  border-bottom-left-radius: 32px;
-  border-bottom-right-radius: 32px;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  position: relative;
 }
 
-header h1 {
-  font-size: 26px;
-  font-weight: 700;
+.badge-pro {
+  background: gold;
+  color: #000;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  vertical-align: middle;
 }
 
-header p {
-  margin-top: 10px;
-  font-size: 14px;
-  opacity: 0.9;
-}
-
-/* =========================
-   MAIN / PDF AREA
-========================= */
-main {
-  max-width: 480px;
-  margin: -45px auto 0;
-  padding: 20px;
-}
-
-/* =========================
-   RESUMO FINANCEIRO
-========================= */
-.resumo {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  margin-bottom: 25px;
-}
+/* Cards & Layout */
+.container { max-width: 500px; margin: -50px auto 40px; padding: 0 20px; }
 
 .card {
   background: var(--card-bg);
-  padding: 16px 10px;
-  border-radius: var(--radius);
-  text-align: center;
-  box-shadow: 0 6px 14px rgba(0,0,0,0.06);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  box-shadow: var(--shadow);
+  margin-bottom: 20px;
+  border: 1px solid rgba(255,255,255,0.8);
 }
 
-.card span {
-  font-size: 11px;
-  color: var(--text-sub);
-  text-transform: uppercase;
+.resumo { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+.resumo .card { padding: 15px 5px; text-align: center; margin-bottom: 0; }
+.resumo span { font-size: 10px; color: var(--text-sub); text-transform: uppercase; font-weight: 700; }
+.resumo strong { display: block; font-size: 14px; margin-top: 5px; }
+
+.destaque { border: 2px solid var(--accent) !important; }
+.texto-receita { color: var(--accent); }
+.texto-despesa { color: var(--danger); }
+
+/* Form */
+.formulario h3 { font-size: 16px; margin-bottom: 15px; color: var(--primary); }
+input {
+  width: 100%; padding: 14px; margin-bottom: 12px;
+  border-radius: var(--radius-md); border: 1px solid var(--border);
+  background: #f1f5f9; font-size: 15px; transition: 0.3s;
+}
+input:focus { border-color: var(--accent); outline: none; background: #fff; }
+
+.botoes-tipo { display: flex; gap: 10px; margin-bottom: 15px; }
+.btn-tipo {
+  flex: 1; padding: 12px; border: 2px solid transparent; border-radius: var(--radius-md);
+  cursor: pointer; font-weight: 600; transition: 0.3s;
+}
+.receita { background: #dcfce7; color: #166534; }
+.despesa { background: #fee2e2; color: #991b1b; }
+.btn-tipo.active-receita { border-color: var(--accent); transform: scale(0.98); }
+.btn-tipo.active-despesa { border-color: var(--danger); transform: scale(0.98); }
+
+.btn-adicionar {
+  width: 100%; padding: 16px; background: var(--primary); color: white;
+  border: none; border-radius: var(--radius-md); font-weight: 700; cursor: pointer;
 }
 
-.card strong {
-  display: block;
-  margin-top: 6px;
-  font-size: 17px;
+/* Lista */
+ul { list-style: none; }
+li {
+  display: flex; justify-content: space-between; padding: 12px 0;
+  border-bottom: 1px solid #f1f5f9; font-size: 14px;
 }
 
-.card.destaque {
-  border: 2px solid var(--accent);
+/* Tools */
+.grid-tools { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.tool-btn {
+  background: white; border: 1px solid var(--border); padding: 10px 5px;
+  border-radius: 12px; font-size: 10px; font-weight: 600; cursor: pointer;
 }
+.tool-btn.danger { color: var(--danger); }
 
-/* =========================
-   FORMULÁRIO
-========================= */
-.formulario {
-  background: var(--card-bg);
-  padding: 22px;
-  border-radius: 22px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-}
-
-.formulario input {
-  width: 100%;
-  padding: 14px;
-  margin-bottom: 12px;
-  border-radius: 14px;
-  border: 1px solid var(--border);
-  font-size: 15px;
-}
-
-/* =========================
-   BOTÕES
-========================= */
-.acoes {
-  display: flex;
-  gap: 10px;
-}
-
-.acoes button {
-  flex: 1;
-  padding: 14px;
-  border-radius: 14px;
-  border: none;
-  font-weight: bold;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-button.entrada {
-  background: var(--accent);
-  color: #053a2a;
-}
-
-button.saida {
-  background: #fee2e2;
-  color: var(--danger);
-}
-
-/* =========================
-   FOOTER / PDF
-========================= */
-footer {
-  max-width: 480px;
-  margin: 20px auto;
-  padding: 0 20px;
-}
-
-footer button {
-  width: 100%;
-  padding: 16px;
-  border-radius: 18px;
-  border: none;
-  background: var(--primary);
-  color: #fff;
-  font-size: 15px;
-  font-weight: bold;
-}
-
-/* =========================
-   MODAL LICENÇA
-========================= */
+/* Modal */
 .modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.75);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 2000;
+  position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+  display: none; align-items: center; justify-content: center; z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+.modal-content { background: white; padding: 30px; border-radius: var(--radius-lg); width: 90%; max-width: 400px; text-align: center; }
+.btn-confirmar { background: var(--accent); color: white; padding: 12px 20px; border: none; border-radius: 12px; margin-top: 10px; cursor: pointer; width: 100%; }
+
+/* Toast */
+#toast {
+  position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+  background: #334155; color: white; padding: 12px 24px; border-radius: 50px;
+  font-size: 13px; display: none; z-index: 2000; box-shadow: var(--shadow);
 }
 
-.modal-content {
-  background: var(--card-bg);
-  padding: 30px;
-  border-radius: 24px;
-  width: 90%;
-  max-width: 380px;
-  text-align: center;
-}
-
-.modal-content h2 {
-  margin-bottom: 10px;
-}
-
-.modal-content p {
-  font-size: 14px;
-  color: var(--text-sub);
-  margin-bottom: 15px;
-}
-
-.modal-content input {
-  width: 100%;
-  padding: 14px;
-  border-radius: 14px;
-  border: 1px solid var(--border);
-  margin-bottom: 15px;
-}
-
-.modal-content button {
-  width: 100%;
-  padding: 14px;
-  border-radius: 14px;
-  background: var(--primary);
-  color: #fff;
-  border: none;
-  font-weight: bold;
-}
-
-/* =========================
-   RESPONSIVO
-========================= */
-@media (max-width: 420px) {
-  .resumo {
-    grid-template-columns: 1fr;
-  }
+@media (max-width: 400px) {
+  .resumo strong { font-size: 12px; }
 }
