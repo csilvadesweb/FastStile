@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#0b2c3d">
-  <title>FastStile Finance</title>
+  <meta name="theme-color" content="#0f172a">
+
+  <title>FastStile Financeiro</title>
 
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="icons/icon-192.png">
@@ -16,99 +17,84 @@
 
 <body>
 
-<!-- TOAST -->
-<div id="toast"></div>
-
-<!-- HEADER -->
 <header>
-  <button id="theme-toggle" onclick="toggleTheme()">🌙</button>
-  <h1>FastStile</h1>
-  <p id="dicaFinanceira">Organização financeira gera liberdade.</p>
+  <div class="header-content">
+    <h1>FastStile</h1>
+    <p id="dicaFinanceira">Controle financeiro inteligente.</p>
+  </div>
+
+  <button id="theme-toggle" onclick="toggleTema()">🌙</button>
+
+  <button class="premium-btn" onclick="abrirLicenca()">⭐ Premium</button>
 </header>
 
 <main>
 
-  <!-- RESUMO -->
-  <section class="resumo">
-    <div class="card">
-      <span>Rendas</span>
-      <strong id="totalRenda">R$ 0,00</strong>
-    </div>
-    <div class="card">
-      <span>Despesas</span>
-      <strong id="totalDespesa">R$ 0,00</strong>
-    </div>
-    <div class="card destaque">
-      <span>Saldo</span>
-      <strong id="saldoTotal">R$ 0,00</strong>
-    </div>
-  </section>
+<section class="cards">
+  <div class="card">
+    <h3>Rendas</h3>
+    <p id="totalRenda">R$ 0,00</p>
+  </div>
 
-  <!-- FORMULÁRIO -->
-  <section class="formulario">
-    <input id="descricao" placeholder="Descrição (ex: Salário)">
-    <input id="valor" type="number" placeholder="Valor">
+  <div class="card">
+    <h3>Despesas</h3>
+    <p id="totalDespesa">R$ 0,00</p>
+  </div>
 
-    <div class="acoes">
-      <button class="entrada" onclick="adicionar()">+ Receita</button>
-      <button class="saida" onclick="adicionarDespesa()">- Despesa</button>
-    </div>
-  </section>
+  <div class="card destaque">
+    <h3>Saldo</h3>
+    <p id="saldoTotal">R$ 0,00</p>
+  </div>
+</section>
 
-  <!-- GRÁFICO -->
-  <section class="card" style="margin-top:20px;">
-    <canvas id="grafico"></canvas>
-  </section>
+<section class="form-section">
+  <input id="descricao" placeholder="Descrição (ex: Salário)">
+  <input id="valor" type="number" placeholder="Valor">
 
-  <!-- LISTA -->
-  <ul id="lista" style="margin-top:20px;"></ul>
+  <div class="input-group">
+    <button class="entrada" onclick="setTipo('renda')">+ Receita</button>
+    <button class="saida" onclick="setTipo('despesa')">- Despesa</button>
+  </div>
+
+  <button class="btn-main" onclick="adicionar()">Adicionar</button>
+</section>
+
+<section class="chart-section">
+  <canvas id="grafico"></canvas>
+</section>
+
+<section class="list-section">
+  <ul id="lista"></ul>
+</section>
+
+<section class="actions">
+  <button onclick="exportarPDF()">PDF 🔒</button>
+  <button onclick="exportarBackup()">Backup 🔒</button>
+  <button onclick="importarBackup()">Importar 🔒</button>
+  <button class="danger" onclick="resetar()">Limpar 🔒</button>
+</section>
+
+<footer>
+  <p>© FastStile Financeiro</p>
+  <a href="#" onclick="mostrarPolitica()">Política de Privacidade</a>
+</footer>
 
 </main>
-
-<!-- AÇÕES -->
-<footer>
-  <button onclick="exportarPDF()">Exportar PDF Premium 🔒</button>
-
-  <div class="acoes" style="margin-top:12px;">
-    <button onclick="exportarBackup()">Backup 🔒</button>
-    <button onclick="importarBackup()">Importar 🔒</button>
-    <button onclick="resetar()">Limpar 🔒</button>
-  </div>
-</footer>
 
 <!-- MODAL LICENÇA -->
 <div id="modalLicenca" class="modal">
   <div class="modal-content">
-    <h2>Ativar Licença</h2>
-    <p>Digite sua chave FastStile</p>
+    <h3>Ativar Licença Premium</h3>
     <input id="chaveLicenca" placeholder="FS-2026-XXXX-XXXX">
-    <button onclick="ativarLicenca()">Ativar</button>
-    <button onclick="fecharLicenca()" style="margin-top:10px;background:#eee;color:#333;">Cancelar</button>
+    <button class="btn-main" onclick="ativarLicenca()">Ativar</button>
+    <button onclick="fecharLicenca()">Cancelar</button>
   </div>
 </div>
 
-<script src="App.js"></script>
+<!-- TOAST -->
+<div id="toast"></div>
+
 <script src="script.js"></script>
-
-<script>
-function adicionarDespesa() {
-  document.getElementById("tipo").value = "despesa";
-  adicionar();
-}
-
-/* TEMA */
-function toggleTheme() {
-  const atual = document.documentElement.getAttribute("data-theme");
-  const novo = atual === "dark" ? "light" : "dark";
-  document.documentElement.setAttribute("data-theme", novo);
-  localStorage.setItem("faststile_theme", novo);
-}
-
-(function () {
-  const temaSalvo = localStorage.getItem("faststile_theme");
-  if (temaSalvo) document.documentElement.setAttribute("data-theme", temaSalvo);
-})();
-</script>
 
 </body>
 </html>
