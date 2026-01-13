@@ -123,12 +123,28 @@ async function buscarCambio() {
     } catch { document.getElementById("miniConverter").innerText = "USD: R$ 5,20"; }
 }
 
+// NOVO: Geração de PDF com Download Direto
 function gerarPDF() {
     if (localStorage.getItem("faststile_premium") !== "true") {
         abrirLicenca();
         return;
     }
-    window.print();
+
+    const elemento = document.getElementById("conteudo-extrato");
+    
+    // Configurações para o download
+    const opcoes = {
+        margin: [10, 10, 10, 10],
+        filename: `Extrato_FastStile_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, logging: false },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    mostrarToast("⏳ Gerando seu PDF...");
+
+    // Gera o PDF e faz o download automático
+    html2pdf().set(opcoes).from(elemento).save();
 }
 
 function exportarBackup() {
@@ -141,10 +157,12 @@ function exportarBackup() {
 function processarImportacao(event) {
     const reader = new FileReader();
     reader.onload = (e) => {
-        transacoes = JSON.parse(e.target.result);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(transacoes));
-        render();
-        mostrarToast("Backup restaurado!");
+        try {
+            transacoes = JSON.parse(e.target.result);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(transacoes));
+            render();
+            mostrarToast("Backup restaurado!");
+        } catch(e) { mostrarToast("Erro no arquivo!"); }
     };
     reader.readAsText(event.target.files[0]);
 }
@@ -165,6 +183,7 @@ function fecharConfirmacao() { document.getElementById("modalConfirmacao").style
 
 function verificarStatusPremium() {
     if(localStorage.getItem("faststile_premium") === "true") {
-        document.getElementById("btnPremiumStatus").innerText = "💎 PRO";
+        const btn = document.getElementById("btnPremiumStatus");
+        if(btn) btn.innerText = "💎 PRO";
     }
 }
