@@ -1,21 +1,24 @@
 "use strict";
 
-const STORAGE_KEY = "faststile_pro_v3";
+const STORAGE_KEY = "faststile_pro_v3_core";
 let transacoes = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 let tipoSelecionado = null;
 let meuGrafico = null;
 
+// Inicialização
 document.addEventListener("DOMContentLoaded", () => {
     render();
     verificarStatusPremium();
 });
 
+// Controle de Tipo
 function setTipo(tipo) {
     tipoSelecionado = tipo;
     document.getElementById('btnReceita').className = 'btn-tipo' + (tipo === 'receita' ? ' active-receita' : '');
     document.getElementById('btnDespesa').className = 'btn-tipo' + (tipo === 'despesa' ? ' active-despesa' : '');
 }
 
+// Salvar Lançamento
 function salvarTransacao() {
     const desc = document.getElementById("descricao").value.trim();
     const valor = parseFloat(document.getElementById("valor").value);
@@ -33,18 +36,24 @@ function salvarTransacao() {
         data: new Date().toLocaleDateString('pt-BR')
     });
 
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(transacoes));
+    salvarEAtualizar();
     limparCampos();
-    render();
-    mostrarToast("Salvo com sucesso!");
+    mostrarToast("Lançamento confirmado!");
 }
 
 function deletarTransacao(id) {
-    transacoes = transacoes.filter(t => t.id !== id);
+    if(confirm("Excluir esta transação?")) {
+        transacoes = transacoes.filter(t => t.id !== id);
+        salvarEAtualizar();
+    }
+}
+
+function salvarEAtualizar() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(transacoes));
     render();
 }
 
+// Renderização Principal
 function render() {
     const lista = document.getElementById("listaTransacoes");
     lista.innerHTML = "";
@@ -80,23 +89,38 @@ function formatarMoeda(v) {
     return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
+// Gráfico com Lógica de Estado Vazio
 function atualizarGrafico(r, d) {
     const ctx = document.getElementById('graficoFinanceiro');
     if (meuGrafico) meuGrafico.destroy();
+    
+    const temDados = r > 0 || d > 0;
+    const dataGrafico = temDados ? [r, d] : [1, 0];
+    const cores = temDados ? ['#10b981', '#ef4444'] : ['#e5e7eb', '#f3f4f6'];
+
     meuGrafico = new Chart(ctx, {
         type: 'doughnut',
         data: {
             datasets: [{
-                data: [r || 1, d || 0],
-                backgroundColor: ['#10b981', '#ef4444'],
+                data: dataGrafico,
+                backgroundColor: cores,
                 borderWidth: 0,
-                cutout: '75%'
+                cutout: '80%',
+                borderRadius: temDados ? 6 : 0
             }]
         },
-        options: { plugins: { legend: { display: false } } }
+        options: { 
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { 
+                legend: { display: false },
+                tooltip: { enabled: temDados }
+            } 
+        }
     });
 }
 
+// Utilitários e Premium
 function mostrarToast(m) {
     const t = document.getElementById("toast");
     t.innerText = m; t.style.display = "block";
@@ -111,13 +135,12 @@ function limparCampos() {
     document.getElementById('btnDespesa').className = 'btn-tipo';
 }
 
-/* PREMIUM LOGIC */
 function isPremium() { return localStorage.getItem("faststile_premium") === "true"; }
 
 function verificarStatusPremium() {
     if(isPremium()) {
         const btn = document.getElementById("btnPremiumStatus");
-        btn.innerText = "💎 Premium Ativo";
+        btn.innerHTML = "💎 Premium Ativo";
         btn.style.background = "#10b981";
         btn.onclick = null;
     }
@@ -131,7 +154,7 @@ function ativarLicenca() {
     if (/^FS-2026-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(chave)) {
         localStorage.setItem("faststile_premium", "true");
         location.reload();
-    } else { alert("Chave inválida!"); }
+    } else { alert("Chave inválida! Use o padrão FS-2026-XXXX-XXXX"); }
 }
 
 function gerarPDF() {
@@ -148,10 +171,15 @@ function exportarBackup() {
     a.href = url; a.download = 'faststile_backup.json'; a.click();
 }
 
+function importarBackup() {
+    if (!isPremium()) return abrirLicenca();
+    mostrarToast("Clique para selecionar arquivo de backup.");
+}
+
 function limparTudo() {
-    if (confirm("Apagar todos os dados?")) {
+    if (confirm("Deseja apagar todos os lançamentos? Esta ação é irreversível.")) {
         transacoes = [];
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(transacoes));
-        render();
+        salvarEAtualizar();
+        mostrarToast("Dados removidos.");
     }
 }
