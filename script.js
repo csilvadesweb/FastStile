@@ -1,25 +1,25 @@
 "use strict";
 
-// ===== STORAGE =====
 const STORAGE_KEY = "faststile_pro_v3_core";
 let transacoes = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 let tipoSelecionado = null;
 let meuGrafico = null;
 
-// ===== INICIALIZAÇÃO =====
 document.addEventListener("DOMContentLoaded", () => {
     initTheme();
     render();
     verificarStatusPremium();
 });
 
-// ===== MODAL PREMIUM =====
+// --- FUNÇÕES DO MODAL PREMIUM ---
 function abrirLicenca() { 
     document.getElementById("modalLicenca").style.display = "flex"; 
 }
+
 function fecharLicenca() { 
     document.getElementById("modalLicenca").style.display = "none"; 
 }
+
 function ativarLicenca() {
     const campo = document.getElementById("chaveLicenca");
     const chave = campo.value.trim().toUpperCase();
@@ -34,11 +34,21 @@ function ativarLicenca() {
     }
 }
 
-// ===== CONFIRMAÇÃO (FastStile diz:) =====
+// --- BLOQUEIO PREMIUM PARA FUNÇÕES ---
+function bloquearPremium() {
+    if (localStorage.getItem("faststile_premium") !== "true") {
+        abrirLicenca();
+        return true;
+    }
+    return false;
+}
+
+// --- SISTEMA DE CONFIRMAÇÃO (FastStile diz:) ---
 function abrirConfirmacao(tipo, id = null) {
     const modal = document.getElementById("modalConfirmacao");
     const msg = document.getElementById("confirmMessage");
     const btn = document.getElementById("btnConfirmarAcao");
+
     modal.style.display = "flex";
 
     if (tipo === 'limpar') {
@@ -49,11 +59,12 @@ function abrirConfirmacao(tipo, id = null) {
         btn.onclick = () => { transacoes = transacoes.filter(t => t.id !== id); salvarEAtualizar(); fecharConfirmacao(); };
     }
 }
+
 function fecharConfirmacao() { 
     document.getElementById("modalConfirmacao").style.display = "none"; 
 }
 
-// ===== FUNÇÕES CORE =====
+// --- CORE DO APP ---
 function setTipo(tipo) {
     tipoSelecionado = tipo;
     document.getElementById('btnReceita').className = 'btn-tipo' + (tipo === 'receita' ? ' active-receita' : '');
@@ -67,13 +78,7 @@ function salvarTransacao() {
         mostrarToast("Preencha tudo corretamente.");
         return;
     }
-    transacoes.unshift({ 
-        id: Date.now(), 
-        desc, 
-        valor, 
-        tipo: tipoSelecionado, 
-        data: new Date().toLocaleDateString('pt-BR') 
-    });
+    transacoes.unshift({ id: Date.now(), desc, valor, tipo: tipoSelecionado, data: new Date().toLocaleDateString('pt-BR') });
     salvarEAtualizar();
     limparCampos();
 }
@@ -83,7 +88,6 @@ function salvarEAtualizar() {
     render();
 }
 
-// ===== RENDER =====
 function render() {
     const lista = document.getElementById("listaTransacoes");
     lista.innerHTML = "";
@@ -91,19 +95,12 @@ function render() {
 
     transacoes.forEach(t => {
         if (t.tipo === "receita") r += t.valor; else d += t.valor;
-
         const li = document.createElement("li");
         li.innerHTML = `
-            <div>
-                <strong>${t.desc}</strong>
-                <small style="display:block;color:var(--text-sub);font-size:10px">${t.data}</small>
-            </div>
+            <div><strong>${t.desc}</strong><small style="display:block;color:var(--text-sub);font-size:10px">${t.data}</small></div>
             <div style="display:flex;align-items:center">
-                <span style="font-weight:700;color:${t.tipo==='receita'?'#10b981':'#ef4444'}">
-                    ${t.valor.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}
-                </span>
-                <button onclick="abrirConfirmacao('deletar', ${t.id})"
-                    style="background:none;border:none;color:#cbd5e1;margin-left:12px;cursor:pointer">✕</button>
+                <span style="font-weight:700;color:${t.tipo==='receita'?'#10b981':'#ef4444'}">${t.valor.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}</span>
+                <button onclick="abrirConfirmacao('deletar', ${t.id})" style="background:none;border:none;color:#cbd5e1;margin-left:12px;cursor:pointer">✕</button>
             </div>`;
         lista.appendChild(li);
     });
@@ -114,22 +111,19 @@ function render() {
 
     const perc = (r+d) > 0 ? Math.round((r/(r+d))*100) : 0;
     document.getElementById("saldoPercent").innerText = perc + "%";
-
     atualizarGrafico(r, d);
 }
 
-// ===== GRÁFICO =====
 function atualizarGrafico(r, d) {
     const ctx = document.getElementById('graficoFinanceiro');
     if (meuGrafico) meuGrafico.destroy();
     const isDark = document.body.classList.contains("dark-theme");
-
     meuGrafico = new Chart(ctx, {
         type: 'doughnut',
         data: {
             datasets: [{
                 data: (r+d)>0 ? [r, d] : [1, 0],
-                backgroundColor: (r+d)>0 ? ['#10b981', '#ef4444'] : [isDark?'#334155':'#e2e8f0','#e2e8f0'],
+                backgroundColor: (r+d)>0 ? ['#10b981', '#ef4444'] : [isDark?'#334155':'#e2e8f0', '#e2e8f0'],
                 borderWidth: 0, cutout: '85%', borderRadius: 20
             }]
         },
@@ -137,27 +131,23 @@ function atualizarGrafico(r, d) {
     });
 }
 
-// ===== PREMIUM =====
 function verificarStatusPremium() {
     if(localStorage.getItem("faststile_premium") === "true") {
         const btn = document.getElementById("btnPremiumStatus");
-        btn.innerHTML = "💎 PRO"; 
-        btn.style.background = "#10b981"; 
-        btn.onclick = null;
+        btn.innerHTML = "💎 PRO"; btn.style.background = "#10b981"; btn.onclick = null;
     }
 }
 
-// ===== BACKUP =====
+// --- FUNÇÕES PREMIUM ---
 function exportarBackup() {
-    if (localStorage.getItem("faststile_premium") !== "true") return abrirLicenca();
+    if (bloquearPremium()) return;
     const blob = new Blob([JSON.stringify(transacoes)], {type: 'application/json'});
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a'); a.href = url; a.download = 'backup.json'; a.click();
 }
 
 function processarImportacao(event) {
-    if (localStorage.getItem("faststile_premium") !== "true") return abrirLicenca();
-
+    if (bloquearPremium()) return;
     const reader = new FileReader();
     reader.onload = (e) => { 
         transacoes = JSON.parse(e.target.result); 
@@ -167,16 +157,19 @@ function processarImportacao(event) {
     reader.readAsText(event.target.files[0]);
 }
 
-// ===== PDF =====
-function gerarPDF() { 
-    if (localStorage.getItem("faststile_premium") !== "true") return abrirLicenca(); 
-    window.print(); 
+function gerarPDF() {
+    if (bloquearPremium()) return;
+    window.print();
 }
 
-// ===== TEMAS =====
-function initTheme() { 
-    document.body.className = localStorage.getItem("theme") || "light-theme"; 
+function resetar() {
+    if (bloquearPremium()) return;
+    localStorage.clear();
+    location.reload();
 }
+
+// --- TEMAS ---
+function initTheme() { document.body.className = localStorage.getItem("theme") || "light-theme"; }
 function toggleTheme() { 
     const n = document.body.classList.contains("dark-theme") ? "light-theme" : "dark-theme"; 
     document.body.className = n; 
@@ -184,15 +177,15 @@ function toggleTheme() {
     render(); 
 }
 
-// ===== TOAST =====
-function mostrarToast(msg) { 
+// --- TOAST ---
+function mostrarToast(m) { 
     const t = document.getElementById("toast"); 
-    t.innerText = msg; 
+    t.innerText = m; 
     t.style.display = "block"; 
     setTimeout(() => t.style.display = "none", 2000); 
 }
 
-// ===== LIMPAR CAMPOS =====
+// --- LIMPAR CAMPOS ---
 function limparCampos() { 
     document.getElementById("descricao").value = ""; 
     document.getElementById("valor").value = ""; 
