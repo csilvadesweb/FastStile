@@ -1,24 +1,19 @@
 "use strict";
 
-const STORAGE_KEY = "faststile_pro_data";
+const STORAGE_KEY = "faststile_pro_v3";
 let transacoes = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 let tipoSelecionado = null;
 let meuGrafico = null;
 
-/** --- INICIALIZAÇÃO --- **/
 document.addEventListener("DOMContentLoaded", () => {
     render();
     verificarStatusPremium();
 });
 
-/** --- CORE TRANSAÇÕES --- **/
 function setTipo(tipo) {
     tipoSelecionado = tipo;
-    document.getElementById('btnReceita').classList.remove('active-receita');
-    document.getElementById('btnDespesa').classList.remove('active-despesa');
-    
-    if(tipo === 'receita') document.getElementById('btnReceita').classList.add('active-receita');
-    else document.getElementById('btnDespesa').classList.add('active-despesa');
+    document.getElementById('btnReceita').className = 'btn-tipo' + (tipo === 'receita' ? ' active-receita' : '');
+    document.getElementById('btnDespesa').className = 'btn-tipo' + (tipo === 'despesa' ? ' active-despesa' : '');
 }
 
 function salvarTransacao() {
@@ -26,42 +21,33 @@ function salvarTransacao() {
     const valor = parseFloat(document.getElementById("valor").value);
 
     if (!desc || isNaN(valor) || !tipoSelecionado) {
-        mostrarToast("Preencha todos os campos e selecione o tipo.");
+        mostrarToast("Preencha os campos e selecione o tipo.");
         return;
     }
 
-    const novaTransacao = {
+    transacoes.unshift({
         id: Date.now(),
         desc,
         valor,
         tipo: tipoSelecionado,
         data: new Date().toLocaleDateString('pt-BR')
-    };
+    });
 
-    transacoes.unshift(novaTransacao);
-    atualizarStorage();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(transacoes));
     limparCampos();
     render();
-    mostrarToast("Lançamento realizado!");
+    mostrarToast("Salvo com sucesso!");
 }
 
-function atualizarStorage() {
+function deletarTransacao(id) {
+    transacoes = transacoes.filter(t => t.id !== id);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(transacoes));
+    render();
 }
 
-function limparCampos() {
-    document.getElementById("descricao").value = "";
-    document.getElementById("valor").value = "";
-    tipoSelecionado = null;
-    document.getElementById('btnReceita').classList.remove('active-receita');
-    document.getElementById('btnDespesa').classList.remove('active-despesa');
-}
-
-/** --- RENDERIZAÇÃO & UI --- **/
 function render() {
     const lista = document.getElementById("listaTransacoes");
     lista.innerHTML = "";
-    
     let r = 0, d = 0;
 
     transacoes.forEach(t => {
@@ -70,10 +56,16 @@ function render() {
 
         const li = document.createElement("li");
         li.innerHTML = `
-            <span>${t.desc} <small style="display:block; color:gray; font-size:10px">${t.data}</small></span>
-            <strong class="${t.tipo === 'receita' ? 'texto-receita' : 'texto-despesa'}">
-                ${t.tipo === 'receita' ? '+' : '-'} ${formatarMoeda(t.valor)}
-            </strong>
+            <div>
+                <strong>${t.desc}</strong>
+                <small style="display:block; color:#9ca3af; font-size:10px">${t.data}</small>
+            </div>
+            <div style="display:flex; align-items:center">
+                <span class="${t.tipo === 'receita' ? 'texto-receita' : 'texto-despesa'}">
+                    ${formatarMoeda(t.valor)}
+                </span>
+                <button class="btn-del" onclick="deletarTransacao(${t.id})">✕</button>
+            </div>
         `;
         lista.appendChild(li);
     });
@@ -81,7 +73,6 @@ function render() {
     document.getElementById("totalRendas").innerText = formatarMoeda(r);
     document.getElementById("totalDespesas").innerText = formatarMoeda(d);
     document.getElementById("saldoTotal").innerText = formatarMoeda(r - d);
-    
     atualizarGrafico(r, d);
 }
 
@@ -89,39 +80,46 @@ function formatarMoeda(v) {
     return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
-/** --- GRÁFICO --- **/
 function atualizarGrafico(r, d) {
-    const ctx = document.getElementById('graficoFinanceiro').getContext('2d');
+    const ctx = document.getElementById('graficoFinanceiro');
     if (meuGrafico) meuGrafico.destroy();
-
-    if (r === 0 && d === 0) return;
-
     meuGrafico = new Chart(ctx, {
         type: 'doughnut',
         data: {
-            labels: ['Rendas', 'Despesas'],
             datasets: [{
-                data: [r, d],
+                data: [r || 1, d || 0],
                 backgroundColor: ['#10b981', '#ef4444'],
-                borderWidth: 0
+                borderWidth: 0,
+                cutout: '75%'
             }]
         },
-        options: {
-            cutout: '70%',
-            plugins: { legend: { display: false } }
-        }
+        options: { plugins: { legend: { display: false } } }
     });
 }
 
-/** --- PREMIUM & UTILITÁRIOS --- **/
-function isPremium() {
-    return localStorage.getItem("faststile_premium") === "true";
+function mostrarToast(m) {
+    const t = document.getElementById("toast");
+    t.innerText = m; t.style.display = "block";
+    setTimeout(() => t.style.display = "none", 2500);
 }
+
+function limparCampos() {
+    document.getElementById("descricao").value = "";
+    document.getElementById("valor").value = "";
+    tipoSelecionado = null;
+    document.getElementById('btnReceita').className = 'btn-tipo';
+    document.getElementById('btnDespesa').className = 'btn-tipo';
+}
+
+/* PREMIUM LOGIC */
+function isPremium() { return localStorage.getItem("faststile_premium") === "true"; }
 
 function verificarStatusPremium() {
     if(isPremium()) {
-        document.getElementById("btnPremiumStatus").innerText = "💎 Premium Ativo";
-        document.getElementById("btnPremiumStatus").style.background = "#10b981";
+        const btn = document.getElementById("btnPremiumStatus");
+        btn.innerText = "💎 Premium Ativo";
+        btn.style.background = "#10b981";
+        btn.onclick = null;
     }
 }
 
@@ -132,41 +130,28 @@ function ativarLicenca() {
     const chave = document.getElementById("chaveLicenca").value.trim();
     if (/^FS-2026-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(chave)) {
         localStorage.setItem("faststile_premium", "true");
-        mostrarToast("Premium Ativado!");
-        verificarStatusPremium();
-        fecharLicenca();
-    } else {
-        alert("Chave inválida. Use o formato FS-2026-XXXX-XXXX");
-    }
+        location.reload();
+    } else { alert("Chave inválida!"); }
 }
 
 function gerarPDF() {
-    if (!isPremium()) { abrirLicenca(); return; }
-    window.print(); // O CSS de impressão pode ser refinado para esconder botões
+    if (!isPremium()) return abrirLicenca();
+    window.print();
 }
 
 function exportarBackup() {
-    if (!isPremium()) { abrirLicenca(); return; }
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(transacoes));
-    const downloadAnchorNode = document.createElement('a');
-    downloadAnchorNode.setAttribute("href", dataStr);
-    downloadAnchorNode.setAttribute("download", "backup_faststile.json");
-    downloadAnchorNode.click();
-    downloadAnchorNode.remove();
+    if (!isPremium()) return abrirLicenca();
+    const data = JSON.stringify(transacoes);
+    const blob = new Blob([data], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'faststile_backup.json'; a.click();
 }
 
 function limparTudo() {
-    if (confirm("Deseja apagar todos os dados permanentemente?")) {
+    if (confirm("Apagar todos os dados?")) {
         transacoes = [];
-        atualizarStorage();
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(transacoes));
         render();
-        mostrarToast("Dados limpos!");
     }
-}
-
-function mostrarToast(msg) {
-    const t = document.getElementById("toast");
-    t.innerText = msg;
-    t.style.display = "block";
-    setTimeout(() => { t.style.display = "none"; }, 3000);
 }
