@@ -1,71 +1,141 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#0f172a">
-  <title>FastStile</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <meta name="theme-color" content="#0f172a" />
 
-  <link rel="manifest" href="manifest.json">
-  <link rel="icon" href="icons/icon-192.png">
-  <link rel="stylesheet" href="style.css">
+  <title>FastStile – Gestão Financeira Inteligente</title>
 
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icons/icon-192.png" />
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- LIBS -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 
-<body>
+<body oncontextmenu="return false;">
 
 <header>
-  <h1>FastStile</h1>
-  <button onclick="abrirLicenca()">Ativar Licença</button>
+  <button id="theme-toggle" onclick="toggleTheme()" aria-label="Alternar Tema">🌓</button>
+
+  <div class="header-content">
+    <h1>FastStile</h1>
+    <span class="badge">Original & Seguro</span>
+  </div>
 </header>
 
 <main>
 
-<section class="cards">
-  <div class="card income">Rendas <span id="totalRenda">R$ 0,00</span></div>
-  <div class="card expense">Despesas <span id="totalDespesa">R$ 0,00</span></div>
-  <div class="card balance">Saldo <span id="saldoTotal">R$ 0,00</span></div>
-</section>
+  <!-- MENSAGEM INTELIGENTE -->
+  <section class="insight-card">
+    <p id="dicaFinanceira">Carregando ambiente seguro...</p>
+  </section>
 
-<section class="form-section">
-  <input id="descricao" placeholder="Descrição">
-  <input id="valor" type="number" placeholder="Valor">
-  <select id="tipo">
-    <option value="renda">Receita</option>
-    <option value="despesa">Despesa</option>
-  </select>
-  <button onclick="adicionar()">Salvar</button>
-</section>
+  <!-- RESUMO -->
+  <section class="cards">
+    <div class="card income">
+      <h3>Rendas</h3>
+      <p id="totalRenda">R$ 0,00</p>
+    </div>
 
-<section>
-  <canvas id="grafico"></canvas>
-</section>
+    <div class="card expense">
+      <h3>Despesas</h3>
+      <p id="totalDespesa">R$ 0,00</p>
+    </div>
 
-<ul id="lista"></ul>
+    <div class="card balance">
+      <h3>Saldo</h3>
+      <p id="saldoTotal">R$ 0,00</p>
+    </div>
+  </section>
 
-<section class="actions">
-  <button onclick="exportarPDF()">PDF 🔒</button>
-  <button onclick="exportarBackup()">Backup 🔒</button>
-  <button onclick="importarBackup()">Importar 🔒</button>
-  <button onclick="resetar()">Resetar 🔒</button>
-</section>
+  <!-- FORM -->
+  <section class="form-section">
+    <div class="input-group">
+      <input id="descricao" type="text" placeholder="Descrição (ex: Salário)" autocomplete="off" />
+      <input id="valor" type="number" placeholder="Valor R$" />
+    </div>
+
+    <div class="input-group">
+      <select id="tipo">
+        <option value="renda">Receita (+)</option>
+        <option value="despesa">Despesa (-)</option>
+      </select>
+
+      <button class="btn-main" onclick="adicionar()">Salvar Registro</button>
+    </div>
+  </section>
+
+  <!-- GRÁFICO -->
+  <section class="chart-section">
+    <canvas id="grafico"></canvas>
+  </section>
+
+  <!-- LISTA -->
+  <section class="list-section">
+    <h2>Fluxo de Caixa</h2>
+    <ul id="lista"></ul>
+  </section>
+
+  <!-- AÇÕES -->
+  <section class="actions">
+    <button class="btn-pdf" onclick="exportarPDF()">PDF Premium 🔒</button>
+    <button onclick="exportarBackup()">Backup 🔒</button>
+    <button onclick="importarBackup()">Importar 🔒</button>
+    <button class="danger" onclick="resetar()">Resetar 🔒</button>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>© 2026 FastStile · <a href="#" onclick="abrirPrivacidade()">Privacidade</a></p>
+  </footer>
 
 </main>
+
+<!-- TOAST -->
+<div id="toast"></div>
 
 <!-- MODAL LICENÇA -->
 <div id="modalLicenca" class="modal">
   <div class="modal-content">
     <h3>Ativar Licença</h3>
-    <input id="chaveLicenca" placeholder="FS-2026-XXXX-XXXX">
-    <button onclick="ativarLicenca()">Ativar</button>
+    <p>Digite sua chave de ativação</p>
+    <input id="chaveLicenca" placeholder="FS-2026-XXXX-XXXX" />
+    <button class="btn-main" onclick="ativarLicenca()">Ativar</button>
     <button onclick="fecharLicenca()">Cancelar</button>
   </div>
 </div>
 
-<script src="App.js"></script>
+<!-- MODAL PRIVACIDADE -->
+<div id="modalPrivacidade" class="modal">
+  <div class="modal-content">
+    <h3>Privacidade & Segurança</h3>
+    <p>
+      ✔ Todos os dados ficam apenas neste dispositivo.<br>
+      ✔ Nenhuma informação é enviada para servidores.<br>
+      ✔ Aplicação protegida conforme Lei 9.609/98.
+    </p>
+    <button class="btn-main" onclick="fecharPrivacidade()">Entendi</button>
+  </div>
+</div>
+
+<!-- SCRIPTS -->
 <script src="script.js"></script>
+
+<script>
+  function abrirPrivacidade() {
+    document.getElementById("modalPrivacidade").style.display = "flex";
+  }
+  function fecharPrivacidade() {
+    document.getElementById("modalPrivacidade").style.display = "none";
+  }
+</script>
 
 </body>
 </html>
