@@ -10,7 +10,9 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="stylesheet" href="style.css">
 </head>
-<body class="light-theme"> <header class="topo">
+<body class="light-theme">
+
+<header class="topo">
   <div class="header-actions">
     <button id="theme-toggle" onclick="toggleTheme()" class="btn-icon">🌓</button>
     <button class="btn-premium-toggle" onclick="abrirLicenca()" id="btnPremiumStatus">⭐ Ativar Premium</button>
@@ -82,11 +84,19 @@
 </footer>
 
 <div id="modalLicenca" class="modal">
-  <div class="modal-content">
+  <div class="modal-content premium-modal">
+    <div class="modal-decoration">💎</div>
     <h2>Ativar Licença PRO</h2>
-    <input type="text" id="chaveLicenca" placeholder="FS-2026-XXXX-XXXX">
-    <button class="btn-confirmar" onclick="ativarLicenca()">Validar Chave</button>
-    <button class="btn-cancelar" onclick="fecharLicenca()">Voltar</button>
+    <p>Desbloqueie ferramentas exclusivas e suporte prioritário.</p>
+    
+    <div class="premium-input-wrapper">
+      <input type="text" id="chaveLicenca" placeholder="FS-2026-XXXX-XXXX" spellcheck="false">
+    </div>
+
+    <div class="modal-actions-stack">
+      <button class="btn-confirmar-premium" onclick="ativarLicenca()">Validar Chave</button>
+      <button class="btn-cancelar-premium" onclick="fecharLicenca()">Voltar ao App</button>
+    </div>
   </div>
 </div>
 
