@@ -9,10 +9,10 @@ document.addEventListener("DOMContentLoaded", () => {
     initTheme();
     render();
     verificarStatusPremium();
-    buscarCambio(); // Nova função para o mini-converter
+    buscarCambio(); // Mini conversor USD
 });
 
-// --- CORE: TEMA E UI ---
+// --- TEMA ---
 function initTheme() {
     const saved = localStorage.getItem("theme") || "light-theme";
     document.body.className = saved;
@@ -22,10 +22,10 @@ function toggleTheme() {
     const novo = document.body.classList.contains("dark-theme") ? "light-theme" : "dark-theme";
     document.body.className = novo;
     localStorage.setItem("theme", novo);
-    render(); // Redesenha o gráfico para ajustar cores
+    render(); // Redesenha gráfico
 }
 
-// --- CORE: TRANSAÇÕES ---
+// --- TRANSAÇÕES ---
 function setTipo(tipo) {
     tipoSelecionado = tipo;
     document.getElementById('btnReceita').className = 'btn-tipo' + (tipo === 'receita' ? ' active-receita' : '');
@@ -35,7 +35,7 @@ function setTipo(tipo) {
 function salvarTransacao() {
     const desc = document.getElementById("descricao").value.trim();
     const valor = parseFloat(document.getElementById("valor").value);
-    
+
     if (!desc || isNaN(valor) || !tipoSelecionado) {
         mostrarToast("⚠️ Preencha todos os campos.");
         return;
@@ -51,8 +51,7 @@ function salvarTransacao() {
 
     transacoes.unshift(novaTransacao);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(transacoes));
-    
-    // Limpeza de UI
+
     document.getElementById("descricao").value = "";
     document.getElementById("valor").value = "";
     setTipo(null);
@@ -68,7 +67,7 @@ function render() {
 
     transacoes.forEach(t => {
         if (t.tipo === "receita") r += t.valor; else d += t.valor;
-        
+
         const li = document.createElement("li");
         li.innerHTML = `
             <div>
@@ -85,24 +84,23 @@ function render() {
         lista.appendChild(li);
     });
 
-    // Atualiza totais
     document.getElementById("totalRendas").innerText = r.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
     document.getElementById("totalDespesas").innerText = d.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
     document.getElementById("saldoTotal").innerText = (r-d).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
 
     const perc = (r+d) > 0 ? Math.round((r/(r+d))*100) : 0;
     document.getElementById("saldoPercent").innerText = perc + "%";
-    
+
     atualizarGrafico(r, d);
 }
 
-// --- CHART: GRÁFICO OTIMIZADO ---
+// --- GRÁFICO ---
 function atualizarGrafico(r, d) {
     const ctx = document.getElementById('graficoFinanceiro');
     if (!ctx) return;
 
     if (meuGrafico) meuGrafico.destroy();
-    
+
     const isDark = document.body.classList.contains("dark-theme");
     const corVazio = isDark ? '#334155' : '#e2e8f0';
 
@@ -125,7 +123,7 @@ function atualizarGrafico(r, d) {
     });
 }
 
-// --- PREMIUM & SISTEMA ---
+// --- PREMIUM ---
 function abrirLicenca() { document.getElementById("modalLicenca").style.display = "flex"; }
 function fecharLicenca() { document.getElementById("modalLicenca").style.display = "none"; }
 
@@ -149,6 +147,16 @@ function bloquearPremium() {
     return false;
 }
 
+function verificarStatusPremium() {
+    if(localStorage.getItem("faststile_premium") === "true") {
+        const btn = document.getElementById("btnPremiumStatus");
+        btn.innerHTML = "💎 PRO";
+        btn.style.background = "var(--accent)";
+        btn.onclick = null;
+    }
+}
+
+// --- CONFIRMAÇÃO ---
 function abrirConfirmacao(tipo, id = null) {
     const modal = document.getElementById("modalConfirmacao");
     const msg = document.getElementById("confirmMessage");
@@ -167,6 +175,7 @@ function abrirConfirmacao(tipo, id = null) {
 
 function fecharConfirmacao() { document.getElementById("modalConfirmacao").style.display = "none"; }
 
+// --- TOAST ---
 function mostrarToast(m) {
     const t = document.getElementById("toast");
     t.innerText = m;
@@ -174,15 +183,7 @@ function mostrarToast(m) {
     setTimeout(() => t.style.display = "none", 2500);
 }
 
-function verificarStatusPremium() {
-    if(localStorage.getItem("faststile_premium") === "true") {
-        const btn = document.getElementById("btnPremiumStatus");
-        btn.innerHTML = "💎 PRO";
-        btn.style.background = "var(--accent)";
-        btn.onclick = null;
-    }
-}
-
+// --- MINICONVERSOR ---
 async function buscarCambio() {
     try {
         const res = await fetch("https://economia.awesomeapi.com.br/last/USD-BRL");
@@ -193,7 +194,7 @@ async function buscarCambio() {
     }
 }
 
-// Funções de arquivo
+// --- BACKUP ---
 function exportarBackup() {
     if (bloquearPremium()) return;
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(transacoes));
@@ -219,7 +220,16 @@ function processarImportacao(event) {
     reader.readAsText(file);
 }
 
+// --- PDF ---
 function gerarPDF() {
     if (bloquearPremium()) return;
     window.print();
+}
+
+// --- POLÍTICA DE PRIVACIDADE ---
+function abrirPrivacidade() {
+    document.getElementById("modalPrivacidade").style.display = "flex";
+}
+function fecharPrivacidade() {
+    document.getElementById("modalPrivacidade").style.display = "none";
 }
