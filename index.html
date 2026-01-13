@@ -47,7 +47,7 @@
   <section class="card formulario">
     <h3>Novo Lançamento</h3>
     <div class="input-group">
-      <input type="text" id="descricao" placeholder="Descrição (ex: Salário)" />
+      <input type="text" id="descricao" placeholder="Descrição (ex: Mercado)" />
       <input type="number" id="valor" placeholder="0,00" step="0.01" />
     </div>
     <div class="botoes-tipo">
@@ -82,19 +82,18 @@
   </section>
 </main>
 
-<footer class="rodape">
-    <a href="privacidade.html" target="_blank">Política de Privacidade</a>
-    <p>© 2026 FastStile Finance</p>
-</footer>
-
 <div id="modalLicenca" class="modal">
   <div class="modal-content premium-box">
-    <div class="premium-badge-icon">💎</div>
-    <h2>Ativar Licença PRO</h2>
-    <p>Acesse relatórios avançados e backup seguro.</p>
-    <div class="input-premium-group">
+    <div class="premium-header">
+      <span class="premium-icon-diamond">💎</span>
+      <h2>Ativar Licença PRO</h2>
+      <p>Acesse relatórios e backup ilimitado.</p>
+    </div>
+    
+    <div class="premium-field">
       <input type="text" id="chaveLicenca" placeholder="FS-2026-XXXX-XXXX" spellcheck="false">
     </div>
+
     <div class="modal-btn-stack">
       <button class="btn-activate-pro" onclick="ativarLicenca()">Validar Chave</button>
       <button class="btn-close-modal" onclick="fecharLicenca()">Voltar</button>
@@ -105,7 +104,7 @@
 <div id="modalConfirmacao" class="modal">
   <div class="modal-content confirm-box">
     <div class="confirm-icon">⚠️</div>
-    <h2 id="confirmTitle">FastStile diz:</h2>
+    <h2>FastStile diz:</h2>
     <p id="confirmMessage">Deseja realizar esta ação?</p>
     <div class="confirm-actions">
       <button id="btnConfirmarAcao" class="btn-confirm-yes">Confirmar</button>
