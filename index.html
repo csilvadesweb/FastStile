@@ -7,8 +7,8 @@
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0b2c3d">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -38,10 +38,6 @@
     </div>
   </section>
 
-  <section class="card chart-box">
-    <canvas id="graficoFinanceiro"></canvas>
-  </section>
-
   <section class="card formulario">
     <h3>Novo Lançamento</h3>
     <div class="input-group">
@@ -54,7 +50,17 @@
       <button class="btn-tipo" onclick="setTipo('despesa')" id="btnDespesa">－ Despesa</button>
     </div>
 
-    <button class="btn-adicionar" onclick="salvarTransacao()">Confirmar</button>
+    <button class="btn-adicionar" onclick="salvarTransacao()">Confirmar Lançamento</button>
+  </section>
+
+  <section class="card chart-box premium-chart">
+    <div class="chart-header">
+      <h3>Visão Geral</h3>
+      <span class="badge-premium-inline">Premium</span>
+    </div>
+    <div class="canvas-container">
+      <canvas id="graficoFinanceiro"></canvas>
+    </div>
   </section>
 
   <section class="card extrato">
