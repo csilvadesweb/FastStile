@@ -35,7 +35,7 @@ function salvarTransacao() {
     const valor = parseFloat(document.getElementById("valor").value);
 
     if (!desc || isNaN(valor) || !tipoSelecionado) {
-        mostrarToast("Preencha todos os campos.");
+        mostrarToast("Preencha os campos corretamente.");
         return;
     }
 
@@ -50,13 +50,6 @@ function salvarTransacao() {
     salvarEAtualizar();
     limparCampos();
     mostrarToast("Lançamento confirmado!");
-}
-
-function deletarTransacao(id) {
-    if(confirm("Deseja excluir este item?")) {
-        transacoes = transacoes.filter(t => t.id !== id);
-        salvarEAtualizar();
-    }
 }
 
 function salvarEAtualizar() {
@@ -80,18 +73,25 @@ function render() {
                 <small style="display:block; color:var(--text-sub); font-size:10px">${t.data}</small>
             </div>
             <div style="display:flex; align-items:center">
-                <span class="${t.tipo === 'receita' ? 'texto-receita' : 'texto-despesa'}" style="font-weight:700">
+                <span style="font-weight:700; color:${t.tipo==='receita'?'#10b981':'#ef4444'}">
                     ${formatarMoeda(t.valor)}
                 </span>
-                <button class="btn-del" onclick="deletarTransacao(${t.id})" style="background:none; border:none; color:var(--text-sub); margin-left:10px; cursor:pointer">✕</button>
+                <button onclick="deletarTransacao(${t.id})" style="background:none; border:none; color:#cbd5e1; margin-left:12px; cursor:pointer">✕</button>
             </div>
         `;
         lista.appendChild(li);
     });
 
+    const saldo = r - d;
     document.getElementById("totalRendas").innerText = formatarMoeda(r);
     document.getElementById("totalDespesas").innerText = formatarMoeda(d);
-    document.getElementById("saldoTotal").innerText = formatarMoeda(r - d);
+    document.getElementById("saldoTotal").innerText = formatarMoeda(saldo);
+    
+    // Cálculo de Porcentagem para o centro do gráfico
+    const total = r + d;
+    const perc = total > 0 ? Math.round((r / total) * 100) : 0;
+    document.getElementById("saldoPercent").innerText = perc + "%";
+
     atualizarGrafico(r, d);
 }
 
@@ -104,7 +104,7 @@ function atualizarGrafico(r, d) {
     if (meuGrafico) meuGrafico.destroy();
     
     const isDark = document.body.classList.contains("dark-theme");
-    const emptyColor = isDark ? '#334155' : '#e5e7eb';
+    const emptyColor = isDark ? '#334155' : '#e2e8f0';
     const temDados = r > 0 || d > 0;
 
     meuGrafico = new Chart(ctx, {
@@ -113,14 +113,24 @@ function atualizarGrafico(r, d) {
             datasets: [{
                 data: temDados ? [r, d] : [1, 0],
                 backgroundColor: temDados ? ['#10b981', '#ef4444'] : [emptyColor, emptyColor],
-                borderWidth: 0, cutout: '82%', borderRadius: temDados ? 8 : 0
+                borderWidth: 0, 
+                cutout: '85%', 
+                borderRadius: 20
             }]
         },
         options: { 
-            responsive: true, maintainAspectRatio: false,
-            plugins: { legend: { display: false }, tooltip: { enabled: temDados } }
+            responsive: true, 
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false }, tooltip: { enabled: false } }
         }
     });
+}
+
+function deletarTransacao(id) {
+    if(confirm("Excluir item?")) {
+        transacoes = transacoes.filter(t => t.id !== id);
+        salvarEAtualizar();
+    }
 }
 
 function mostrarToast(m) {
@@ -137,13 +147,11 @@ function limparCampos() {
     document.getElementById('btnDespesa').className = 'btn-tipo';
 }
 
-// --- LOGICA PREMIUM ---
-function isPremium() { return localStorage.getItem("faststile_premium") === "true"; }
-
+// PREMIUM
 function verificarStatusPremium() {
-    if(isPremium()) {
+    if(localStorage.getItem("faststile_premium") === "true") {
         const btn = document.getElementById("btnPremiumStatus");
-        btn.innerHTML = "💎 PRO Ativo";
+        btn.innerHTML = "💎 PRO";
         btn.style.background = "#10b981";
         btn.onclick = null;
     }
@@ -156,31 +164,11 @@ function ativarLicenca() {
     const chave = document.getElementById("chaveLicenca").value.trim().toUpperCase();
     if (/^FS-2026-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(chave)) {
         localStorage.setItem("faststile_premium", "true");
-        mostrarToast("💎 Premium Ativado com Sucesso!");
-        setTimeout(() => location.reload(), 1500);
+        location.reload();
     } else {
-        alert("Chave inválida! Verifique o código.");
+        alert("Chave inválida!");
     }
 }
 
-function gerarPDF() {
-    if (!isPremium()) return abrirLicenca();
-    window.print();
-}
-
-function exportarBackup() {
-    if (!isPremium()) return abrirLicenca();
-    const data = JSON.stringify(transacoes);
-    const blob = new Blob([data], {type: 'application/json'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = 'faststile_backup.json'; a.click();
-}
-
-function limparTudo() {
-    if (confirm("Apagar todos os dados permanentemente?")) {
-        transacoes = [];
-        salvarEAtualizar();
-        mostrarToast("Dados removidos.");
-    }
-}
+function gerarPDF() { if (localStorage.getItem("faststile_premium") !== "true") return abrirLicenca(); window.print(); }
+function limparTudo() { if (confirm("Apagar tudo?")) { transacoes = []; salvarEAtualizar(); } }
