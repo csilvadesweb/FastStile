@@ -19,31 +19,48 @@
   </div>
   <div class="header-content">
     <h1>FastStile <span class="badge-pro">PRO</span></h1>
-    <p>Sua soberania financeira</p>
+    <p>Gestão Financeira Inteligente</p>
   </div>
 </header>
 
 <main class="container">
-  <section class="resumo">
-    <div class="card-mini">
-      <span>Rendas</span>
-      <strong id="totalRendas" class="texto-receita">R$ 0,00</strong>
+  
+  <section class="card dashboard">
+    <div class="chart-container">
+      <canvas id="graficoFinanceiro"></canvas>
+      <div class="chart-center-text">
+        <span id="saldoPercent">0%</span>
+      </div>
     </div>
-    <div class="card-mini">
-      <span>Despesas</span>
-      <strong id="totalDespesas" class="texto-despesa">R$ 0,00</strong>
-    </div>
-    <div class="card-mini destaque">
-      <span>Saldo</span>
-      <strong id="saldoTotal">R$ 0,00</strong>
+    <div class="resumo-mini">
+      <div class="item-resumo">
+        <span class="dot receita"></span>
+        <div>
+          <small>Rendas</small>
+          <strong id="totalRendas">R$ 0,00</strong>
+        </div>
+      </div>
+      <div class="item-resumo">
+        <span class="dot despesa"></span>
+        <div>
+          <small>Despesas</small>
+          <strong id="totalDespesas">R$ 0,00</strong>
+        </div>
+      </div>
+      <div class="item-resumo total">
+        <div>
+          <small>Saldo Geral</small>
+          <strong id="saldoTotal">R$ 0,00</strong>
+        </div>
+      </div>
     </div>
   </section>
 
   <section class="card formulario">
     <h3>Novo Lançamento</h3>
     <div class="input-group">
-      <input type="text" id="descricao" placeholder="Descrição" />
-      <input type="number" id="valor" placeholder="Valor (R$)" step="0.01" />
+      <input type="text" id="descricao" placeholder="Descrição (ex: Aluguel)" />
+      <input type="number" id="valor" placeholder="0,00" step="0.01" />
     </div>
     <div class="botoes-tipo">
       <button class="btn-tipo" onclick="setTipo('receita')" id="btnReceita">＋ Receita</button>
@@ -52,29 +69,31 @@
     <button class="btn-adicionar" onclick="salvarTransacao()">Confirmar Lançamento</button>
   </section>
 
-  <section class="card chart-box premium-chart">
-    <div class="chart-header">
-      <h3>Visão Geral</h3>
-      <span class="badge-premium-inline">Premium</span>
-    </div>
-    <div class="canvas-container">
-      <canvas id="graficoFinanceiro"></canvas>
-    </div>
-  </section>
-
   <section class="card extrato">
     <div class="extrato-header">
       <h3>Histórico</h3>
-      <div id="moedaConversor" class="mini-converter">USD: R$ 5,20</div>
+      <div class="mini-converter">USD: R$ 5,20</div>
     </div>
     <ul id="listaTransacoes"></ul>
   </section>
 
   <section class="ferramentas-grid">
-    <button onclick="gerarPDF()" class="btn-tool">📄 PDF</button>
-    <button onclick="exportarBackup()" class="btn-tool">☁️ Backup</button>
-    <button onclick="importarBackup()" class="btn-tool">📥 Importar</button>
-    <button onclick="limparTudo()" class="btn-tool danger">🗑️ Limpar</button>
+    <button onclick="gerarPDF()" class="tool-card">
+      <span class="tool-icon">📄</span>
+      <span class="tool-label">PDF</span>
+    </button>
+    <button onclick="exportarBackup()" class="tool-card">
+      <span class="tool-icon">☁️</span>
+      <span class="tool-label">Backup</span>
+    </button>
+    <button onclick="importarBackup()" class="tool-card">
+      <span class="tool-icon">📥</span>
+      <span class="tool-label">Importar</span>
+    </button>
+    <button onclick="limparTudo()" class="tool-card danger">
+      <span class="tool-icon">🗑️</span>
+      <span class="tool-label">Limpar</span>
+    </button>
   </section>
 </main>
 
@@ -84,18 +103,18 @@
 </footer>
 
 <div id="modalLicenca" class="modal">
-  <div class="modal-content premium-modal">
-    <div class="modal-decoration">💎</div>
+  <div class="modal-content premium-box">
+    <div class="premium-badge-icon">💎</div>
     <h2>Ativar Licença PRO</h2>
-    <p>Desbloqueie ferramentas exclusivas e suporte prioritário.</p>
+    <p>Acesse relatórios avançados e backup seguro.</p>
     
-    <div class="premium-input-wrapper">
+    <div class="input-premium-group">
       <input type="text" id="chaveLicenca" placeholder="FS-2026-XXXX-XXXX" spellcheck="false">
     </div>
 
-    <div class="modal-actions-stack">
-      <button class="btn-confirmar-premium" onclick="ativarLicenca()">Validar Chave</button>
-      <button class="btn-cancelar-premium" onclick="fecharLicenca()">Voltar ao App</button>
+    <div class="modal-btn-stack">
+      <button class="btn-activate-pro" onclick="ativarLicenca()">Validar Chave</button>
+      <button class="btn-close-modal" onclick="fecharLicenca()">Voltar</button>
     </div>
   </div>
 </div>
