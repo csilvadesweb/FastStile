@@ -10,16 +10,15 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
-
-<header class="topo">
+<body class="light-theme"> <header class="topo">
+  <div class="header-actions">
+    <button id="theme-toggle" onclick="toggleTheme()" class="btn-icon">🌓</button>
+    <button class="btn-premium-toggle" onclick="abrirLicenca()" id="btnPremiumStatus">⭐ Ativar Premium</button>
+  </div>
   <div class="header-content">
     <h1>FastStile <span class="badge-pro">PRO</span></h1>
     <p>Sua soberania financeira</p>
   </div>
-  <button class="btn-premium-toggle" onclick="abrirLicenca()" id="btnPremiumStatus">
-    ⭐ Ativar Premium
-  </button>
 </header>
 
 <main class="container">
@@ -44,12 +43,10 @@
       <input type="text" id="descricao" placeholder="Descrição" />
       <input type="number" id="valor" placeholder="Valor (R$)" step="0.01" />
     </div>
-    
     <div class="botoes-tipo">
       <button class="btn-tipo" onclick="setTipo('receita')" id="btnReceita">＋ Receita</button>
       <button class="btn-tipo" onclick="setTipo('despesa')" id="btnDespesa">－ Despesa</button>
     </div>
-
     <button class="btn-adicionar" onclick="salvarTransacao()">Confirmar Lançamento</button>
   </section>
 
@@ -79,10 +76,14 @@
   </section>
 </main>
 
+<footer class="rodape">
+    <a href="privacidade.html" target="_blank">Política de Privacidade</a>
+    <p>© 2026 FastStile Finance</p>
+</footer>
+
 <div id="modalLicenca" class="modal">
   <div class="modal-content">
     <h2>Ativar Licença PRO</h2>
-    <p>Insira sua chave para liberar funções de exportação e backup.</p>
     <input type="text" id="chaveLicenca" placeholder="FS-2026-XXXX-XXXX">
     <button class="btn-confirmar" onclick="ativarLicenca()">Validar Chave</button>
     <button class="btn-cancelar" onclick="fecharLicenca()">Voltar</button>
