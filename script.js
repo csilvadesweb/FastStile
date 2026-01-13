@@ -11,7 +11,6 @@ document.addEventListener("DOMContentLoaded", () => {
     verificarStatusPremium();
 });
 
-// --- SISTEMA DE TEMAS ---
 function initTheme() {
     const savedTheme = localStorage.getItem("theme") || "light-theme";
     document.body.className = savedTheme;
@@ -22,10 +21,9 @@ function toggleTheme() {
     const newTheme = isDark ? "light-theme" : "dark-theme";
     document.body.className = newTheme;
     localStorage.setItem("theme", newTheme);
-    render(); // Re-renderiza para atualizar cores do gráfico se necessário
+    render();
 }
 
-// --- CORE TRANSAÇÕES ---
 function setTipo(tipo) {
     tipoSelecionado = tipo;
     document.getElementById('btnReceita').className = 'btn-tipo' + (tipo === 'receita' ? ' active-receita' : '');
@@ -37,7 +35,7 @@ function salvarTransacao() {
     const valor = parseFloat(document.getElementById("valor").value);
 
     if (!desc || isNaN(valor) || !tipoSelecionado) {
-        mostrarToast("Preencha os campos corretamente.");
+        mostrarToast("Preencha todos os campos.");
         return;
     }
 
@@ -51,11 +49,11 @@ function salvarTransacao() {
 
     salvarEAtualizar();
     limparCampos();
-    mostrarToast("Confirmado!");
+    mostrarToast("Lançamento confirmado!");
 }
 
 function deletarTransacao(id) {
-    if(confirm("Excluir item?")) {
+    if(confirm("Deseja excluir este item?")) {
         transacoes = transacoes.filter(t => t.id !== id);
         salvarEAtualizar();
     }
@@ -82,10 +80,10 @@ function render() {
                 <small style="display:block; color:var(--text-sub); font-size:10px">${t.data}</small>
             </div>
             <div style="display:flex; align-items:center">
-                <span class="${t.tipo === 'receita' ? 'texto-receita' : 'texto-despesa'}">
+                <span class="${t.tipo === 'receita' ? 'texto-receita' : 'texto-despesa'}" style="font-weight:700">
                     ${formatarMoeda(t.valor)}
                 </span>
-                <button class="btn-del" onclick="deletarTransacao(${t.id})">✕</button>
+                <button class="btn-del" onclick="deletarTransacao(${t.id})" style="background:none; border:none; color:var(--text-sub); margin-left:10px; cursor:pointer">✕</button>
             </div>
         `;
         lista.appendChild(li);
@@ -101,38 +99,30 @@ function formatarMoeda(v) {
     return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
-// --- GRÁFICO ---
 function atualizarGrafico(r, d) {
     const ctx = document.getElementById('graficoFinanceiro');
     if (meuGrafico) meuGrafico.destroy();
     
     const isDark = document.body.classList.contains("dark-theme");
     const emptyColor = isDark ? '#334155' : '#e5e7eb';
-    
     const temDados = r > 0 || d > 0;
-    const dataGrafico = temDados ? [r, d] : [1, 0];
-    const cores = temDados ? ['#10b981', '#ef4444'] : [emptyColor, emptyColor];
 
     meuGrafico = new Chart(ctx, {
         type: 'doughnut',
         data: {
             datasets: [{
-                data: dataGrafico,
-                backgroundColor: cores,
-                borderWidth: 0,
-                cutout: '80%',
-                borderRadius: temDados ? 6 : 0
+                data: temDados ? [r, d] : [1, 0],
+                backgroundColor: temDados ? ['#10b981', '#ef4444'] : [emptyColor, emptyColor],
+                borderWidth: 0, cutout: '82%', borderRadius: temDados ? 8 : 0
             }]
         },
         options: { 
-            responsive: true,
-            maintainAspectRatio: false,
+            responsive: true, maintainAspectRatio: false,
             plugins: { legend: { display: false }, tooltip: { enabled: temDados } }
         }
     });
 }
 
-// --- UTILITÁRIOS PREMIUM ---
 function mostrarToast(m) {
     const t = document.getElementById("toast");
     t.innerText = m; t.style.display = "block";
@@ -147,12 +137,13 @@ function limparCampos() {
     document.getElementById('btnDespesa').className = 'btn-tipo';
 }
 
+// --- LOGICA PREMIUM ---
 function isPremium() { return localStorage.getItem("faststile_premium") === "true"; }
 
 function verificarStatusPremium() {
     if(isPremium()) {
         const btn = document.getElementById("btnPremiumStatus");
-        btn.innerHTML = "💎 PRO";
+        btn.innerHTML = "💎 PRO Ativo";
         btn.style.background = "#10b981";
         btn.onclick = null;
     }
@@ -162,11 +153,14 @@ function abrirLicenca() { document.getElementById("modalLicenca").style.display 
 function fecharLicenca() { document.getElementById("modalLicenca").style.display = "none"; }
 
 function ativarLicenca() {
-    const chave = document.getElementById("chaveLicenca").value.trim();
+    const chave = document.getElementById("chaveLicenca").value.trim().toUpperCase();
     if (/^FS-2026-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(chave)) {
         localStorage.setItem("faststile_premium", "true");
-        location.reload();
-    } else { alert("Chave inválida!"); }
+        mostrarToast("💎 Premium Ativado com Sucesso!");
+        setTimeout(() => location.reload(), 1500);
+    } else {
+        alert("Chave inválida! Verifique o código.");
+    }
 }
 
 function gerarPDF() {
@@ -180,12 +174,13 @@ function exportarBackup() {
     const blob = new Blob([data], {type: 'application/json'});
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url; a.download = 'backup.json'; a.click();
+    a.href = url; a.download = 'faststile_backup.json'; a.click();
 }
 
 function limparTudo() {
-    if (confirm("Apagar tudo?")) {
+    if (confirm("Apagar todos os dados permanentemente?")) {
         transacoes = [];
         salvarEAtualizar();
+        mostrarToast("Dados removidos.");
     }
 }
