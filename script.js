@@ -1,38 +1,53 @@
 "use strict";
 
-/* =========================
-   CONFIGURAÇÃO GERAL
-========================= */
+/* =====================
+   CONFIG
+===================== */
 
-const STORAGE_KEY = "faststile_dados";
-const LIC_KEY = "faststile_licenciado";
+const STORAGE_KEY = "faststile_data";
+let transacoes = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+let grafico = null;
+let tipoAtual = "renda";
 
-/* =========================
+/* =====================
+   TEMA
+===================== */
+
+function toggleTema() {
+  const html = document.documentElement;
+  const atual = html.getAttribute("data-theme");
+  const novo = atual === "dark" ? "light" : "dark";
+  html.setAttribute("data-theme", novo);
+  localStorage.setItem("faststile_tema", novo);
+}
+
+(function () {
+  const tema = localStorage.getItem("faststile_tema");
+  if (tema) document.documentElement.setAttribute("data-theme", tema);
+})();
+
+/* =====================
    LICENÇA
-========================= */
+===================== */
 
 function validarLicenca(chave) {
   return /^FS-2026-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(chave);
 }
 
 function ativarLicenca() {
-  const input = document.getElementById("chaveLicenca");
-  const chave = input.value.trim().toUpperCase();
-
+  const chave = document.getElementById("chaveLicenca").value.trim();
   if (!validarLicenca(chave)) {
-    mostrarToast("❌ Chave inválida");
+    toast("Chave inválida");
     return;
   }
-
-  localStorage.setItem(LIC_KEY, "true");
+  localStorage.setItem("faststile_licenciado", "true");
   localStorage.setItem("faststile_chave", chave);
-
-  mostrarToast("✅ Licença Premium ativada");
+  toast("Licença ativada com sucesso!");
   fecharLicenca();
 }
 
 function isLicenciado() {
-  return localStorage.getItem(LIC_KEY) === "true";
+  return localStorage.getItem("faststile_licenciado") === "true";
 }
 
 function bloquearPremium() {
@@ -43,154 +58,138 @@ function bloquearPremium() {
   return false;
 }
 
-/* =========================
-   MODAL LICENÇA
-========================= */
-
 function abrirLicenca() {
-  const modal = document.getElementById("modalLicenca");
-  if (modal) modal.style.display = "flex";
+  document.getElementById("modalLicenca").style.display = "flex";
 }
 
 function fecharLicenca() {
-  const modal = document.getElementById("modalLicenca");
-  if (modal) modal.style.display = "none";
+  document.getElementById("modalLicenca").style.display = "none";
 }
 
-/* =========================
-   MENSAGEM INICIAL
-========================= */
+/* =====================
+   DICAS
+===================== */
 
 const dicas = [
-  "Organização financeira gera liberdade.",
-  "Controle seus gastos e domine seu futuro.",
   "Pequenas economias criam grandes resultados.",
-  "Seu dinheiro deve trabalhar por você.",
-  "Planejar hoje evita dívidas amanhã."
+  "Organização financeira gera liberdade.",
+  "Controle hoje, tranquilidade amanhã.",
+  "Seus dados ficam só no seu dispositivo."
 ];
 
 function iniciarMensagem() {
-  const el = document.getElementById("dicaFinanceira");
-  if (!el) return;
-
-  const index = Math.floor(Math.random() * dicas.length);
-  el.textContent = dicas[index];
+  document.getElementById("dicaFinanceira").textContent =
+    dicas[Math.floor(Math.random() * dicas.length)];
 }
 
-/* =========================
-   TOAST
-========================= */
+/* =====================
+   FINANÇAS
+===================== */
 
-function mostrarToast(msg) {
-  const toast = document.getElementById("toast");
-  if (!toast) return;
-
-  toast.textContent = msg;
-  toast.classList.add("show");
-
-  setTimeout(() => {
-    toast.classList.remove("show");
-  }, 3000);
+function setTipo(tipo) {
+  tipoAtual = tipo;
 }
 
-/* =========================
-   DADOS FINANCEIROS
-========================= */
-
-function obterDados() {
-  return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+function salvar() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(transacoes));
 }
 
-function salvarDados(dados) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
-}
+function adicionar() {
+  const desc = descricao.value.trim();
+  const valor = Number(valorInput.value);
 
-function adicionarRegistro(tipo) {
-  const descricao = document.getElementById("descricao").value.trim();
-  const valor = parseFloat(document.getElementById("valor").value);
-
-  if (!descricao || isNaN(valor) || valor <= 0) {
-    mostrarToast("⚠️ Preencha corretamente");
+  if (!desc || !valor) {
+    toast("Preencha todos os campos");
     return;
   }
 
-  const dados = obterDados();
-  dados.push({
-    tipo,
-    descricao,
-    valor,
-    data: new Date().toLocaleDateString("pt-BR")
+  transacoes.push({ desc, valor, tipo: tipoAtual });
+  salvar();
+  descricao.value = "";
+  valorInput.value = "";
+  render();
+}
+
+function render() {
+  lista.innerHTML = "";
+  let renda = 0, despesa = 0;
+
+  transacoes.forEach(t => {
+    t.tipo === "renda" ? renda += t.valor : despesa += t.valor;
+
+    const li = document.createElement("li");
+    li.textContent = `${t.desc} — R$ ${t.valor.toFixed(2)}`;
+    lista.appendChild(li);
   });
 
-  salvarDados(dados);
-  atualizarResumo();
-  limparFormulario();
+  totalRenda.textContent = renda.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+  totalDespesa.textContent = despesa.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+  saldoTotal.textContent = (renda-despesa).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
 
-  mostrarToast("✔ Registro salvo");
+  atualizarGrafico(renda, despesa);
 }
 
-function limparFormulario() {
-  document.getElementById("descricao").value = "";
-  document.getElementById("valor").value = "";
-}
-
-function atualizarResumo() {
-  const dados = obterDados();
-
-  let rendas = 0;
-  let despesas = 0;
-
-  dados.forEach(item => {
-    if (item.tipo === "entrada") rendas += item.valor;
-    else despesas += item.valor;
+function atualizarGrafico(renda, despesa) {
+  if (grafico) grafico.destroy();
+  grafico = new Chart(graficoCanvas, {
+    type: "doughnut",
+    data: {
+      labels: ["Rendas", "Despesas"],
+      datasets: [{ data: [renda, despesa] }]
+    }
   });
-
-  document.getElementById("totalRendas").textContent = rendas.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-  document.getElementById("totalDespesas").textContent = despesas.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-  document.getElementById("saldo").textContent = (rendas - despesas).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
-/* =========================
-   PDF PREMIUM (BANCÁRIO)
-========================= */
+/* =====================
+   PREMIUM
+===================== */
 
 function exportarPDF() {
   if (bloquearPremium()) return;
 
-  const area = document.getElementById("relatorioPDF");
-  if (!area) {
-    mostrarToast("Erro ao gerar PDF");
-    return;
-  }
-
-  const opt = {
-    margin: [15, 15, 15, 15],
-    filename: "FastStile_Financeiro_Premium.pdf",
-    image: { type: "jpeg", quality: 1 },
-    html2canvas: {
-      scale: 3,
-      backgroundColor: "#ffffff",
-      useCORS: true
-    },
-    jsPDF: {
-      unit: "mm",
-      format: "a4",
-      orientation: "portrait"
-    }
-  };
-
-  html2pdf().set(opt).from(area).save();
+  html2pdf().set({
+    filename: "FastStile_Premium.pdf",
+    html2canvas: { scale: 2 },
+    jsPDF: { format: "a4" }
+  }).from(document.body).save();
 }
 
-/* =========================
-   INICIALIZAÇÃO
-========================= */
+function exportarBackup() {
+  if (bloquearPremium()) return;
+  const blob = new Blob([JSON.stringify(transacoes)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "faststile-backup.json";
+  a.click();
+}
+
+function importarBackup() {
+  if (bloquearPremium()) return;
+  alert("Importação premium (upload pode ser adicionado)");
+}
+
+function resetar() {
+  if (bloquearPremium()) return;
+  localStorage.clear();
+  location.reload();
+}
+
+/* =====================
+   TOAST
+===================== */
+
+function toast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"),3000);
+}
+
+/* =====================
+   INIT
+===================== */
 
 document.addEventListener("DOMContentLoaded", () => {
   iniciarMensagem();
-  atualizarResumo();
-
-  if (!isLicenciado()) {
-    setTimeout(abrirLicenca, 700);
-  }
+  render();
 });
