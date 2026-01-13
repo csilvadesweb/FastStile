@@ -7,7 +7,10 @@
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0b2c3d">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  
   <link rel="stylesheet" href="style.css">
 </head>
 <body class="light-theme">
@@ -25,7 +28,7 @@
   </div>
 </header>
 
-<main class="container">
+<main class="container" id="conteudo-extrato">
   <section class="card dashboard">
     <div class="chart-container">
       <canvas id="graficoFinanceiro"></canvas>
@@ -47,7 +50,7 @@
     </div>
   </section>
 
-  <section class="card formulario">
+  <section class="card formulario no-print">
     <h3>Novo Lançamento</h3>
     <div class="input-group">
       <input type="text" id="descricao" placeholder="Descrição" autocomplete="off" />
@@ -68,7 +71,7 @@
     <ul id="listaTransacoes"></ul>
   </section>
 
-  <section class="ferramentas-grid">
+  <section class="ferramentas-grid no-print">
     <button onclick="gerarPDF()" class="tool-card">📄 PDF</button>
     <button onclick="exportarBackup()" class="tool-card">☁️ Backup</button>
     <button onclick="document.getElementById('inputImportar').click()" class="tool-card">📥 Importar</button>
