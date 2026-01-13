@@ -1,14 +1,11 @@
 "use strict";
 
 /* =========================
-   CONFIGURAÇÕES
+   CONFIGURAÇÃO GERAL
 ========================= */
 
-const STORAGE_KEY = "faststile_data";
-const THEME_KEY = "faststile_theme";
-
-let transacoes = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-let grafico = null;
+const STORAGE_KEY = "faststile_dados";
+const LIC_KEY = "faststile_licenciado";
 
 /* =========================
    LICENÇA
@@ -20,24 +17,22 @@ function validarLicenca(chave) {
 
 function ativarLicenca() {
   const input = document.getElementById("chaveLicenca");
-  if (!input) return;
-
-  const chave = input.value.trim();
+  const chave = input.value.trim().toUpperCase();
 
   if (!validarLicenca(chave)) {
     mostrarToast("❌ Chave inválida");
     return;
   }
 
-  localStorage.setItem("faststile_licenciado", "true");
+  localStorage.setItem(LIC_KEY, "true");
   localStorage.setItem("faststile_chave", chave);
 
-  mostrarToast("✅ Licença ativada com sucesso!");
+  mostrarToast("✅ Licença Premium ativada");
   fecharLicenca();
 }
 
 function isLicenciado() {
-  return localStorage.getItem("faststile_licenciado") === "true";
+  return localStorage.getItem(LIC_KEY) === "true";
 }
 
 function bloquearPremium() {
@@ -63,29 +58,15 @@ function fecharLicenca() {
 }
 
 /* =========================
-   TEMA CLARO / ESCURO
-========================= */
-
-function aplicarTema(theme) {
-  document.documentElement.setAttribute("data-theme", theme);
-  localStorage.setItem(THEME_KEY, theme);
-}
-
-function toggleTheme() {
-  const atual = document.documentElement.getAttribute("data-theme") || "light";
-  aplicarTema(atual === "dark" ? "light" : "dark");
-}
-
-/* =========================
    MENSAGEM INICIAL
 ========================= */
 
 const dicas = [
-  "Controle financeiro inteligente começa com pequenos hábitos.",
-  "Seus dados ficam apenas no seu dispositivo.",
   "Organização financeira gera liberdade.",
-  "Evite gastos impulsivos. Planeje.",
-  "Economizar é tão importante quanto ganhar."
+  "Controle seus gastos e domine seu futuro.",
+  "Pequenas economias criam grandes resultados.",
+  "Seu dinheiro deve trabalhar por você.",
+  "Planejar hoje evita dívidas amanhã."
 ];
 
 function iniciarMensagem() {
@@ -107,166 +88,98 @@ function mostrarToast(msg) {
   toast.textContent = msg;
   toast.classList.add("show");
 
-  setTimeout(() => toast.classList.remove("show"), 3000);
+  setTimeout(() => {
+    toast.classList.remove("show");
+  }, 3000);
 }
 
 /* =========================
-   FINANÇAS
+   DADOS FINANCEIROS
 ========================= */
 
-function salvar() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(transacoes));
+function obterDados() {
+  return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 }
 
-function adicionar() {
-  const descricao = document.getElementById("descricao");
-  const valor = document.getElementById("valor");
-  const tipo = document.getElementById("tipo");
+function salvarDados(dados) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
+}
 
-  if (!descricao || !valor || !tipo) return;
+function adicionarRegistro(tipo) {
+  const descricao = document.getElementById("descricao").value.trim();
+  const valor = parseFloat(document.getElementById("valor").value);
 
-  const desc = descricao.value.trim();
-  const val = Number(valor.value);
-
-  if (!desc || !val) {
-    mostrarToast("⚠️ Preencha todos os campos");
+  if (!descricao || isNaN(valor) || valor <= 0) {
+    mostrarToast("⚠️ Preencha corretamente");
     return;
   }
 
-  transacoes.push({ desc, valor: val, tipo: tipo.value });
-  salvar();
-  render();
-
-  /* LIMPA CAMPOS (isso tinha sumido) */
-  descricao.value = "";
-  valor.value = "";
-  descricao.focus();
-}
-
-function render() {
-  const lista = document.getElementById("lista");
-  if (!lista) return;
-
-  lista.innerHTML = "";
-
-  let renda = 0;
-  let despesa = 0;
-
-  transacoes.forEach(t => {
-    if (t.tipo === "renda") renda += t.valor;
-    else despesa += t.valor;
-
-    const li = document.createElement("li");
-    li.innerHTML = `<span>${t.desc}</span><strong>R$ ${t.valor.toFixed(2)}</strong>`;
-    lista.appendChild(li);
+  const dados = obterDados();
+  dados.push({
+    tipo,
+    descricao,
+    valor,
+    data: new Date().toLocaleDateString("pt-BR")
   });
 
-  document.getElementById("totalRenda").textContent =
-    renda.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  salvarDados(dados);
+  atualizarResumo();
+  limparFormulario();
 
-  document.getElementById("totalDespesa").textContent =
-    despesa.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-
-  document.getElementById("saldoTotal").textContent =
-    (renda - despesa).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-
-  atualizarGrafico(renda, despesa);
+  mostrarToast("✔ Registro salvo");
 }
 
-function atualizarGrafico(renda, despesa) {
-  const canvas = document.getElementById("grafico");
-  if (!canvas) return;
+function limparFormulario() {
+  document.getElementById("descricao").value = "";
+  document.getElementById("valor").value = "";
+}
 
-  if (grafico) grafico.destroy();
+function atualizarResumo() {
+  const dados = obterDados();
 
-  grafico = new Chart(canvas, {
-    type: "doughnut",
-    data: {
-      labels: ["Rendas", "Despesas"],
-      datasets: [{
-        data: [renda, despesa],
-        backgroundColor: ["#10b981", "#ef4444"]
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: { position: "bottom" }
-      }
-    }
+  let rendas = 0;
+  let despesas = 0;
+
+  dados.forEach(item => {
+    if (item.tipo === "entrada") rendas += item.valor;
+    else despesas += item.valor;
   });
+
+  document.getElementById("totalRendas").textContent = rendas.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  document.getElementById("totalDespesas").textContent = despesas.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  document.getElementById("saldo").textContent = (rendas - despesas).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
 /* =========================
-   PDF PREMIUM (VISUAL BANCO)
+   PDF PREMIUM (BANCÁRIO)
 ========================= */
 
 function exportarPDF() {
   if (bloquearPremium()) return;
 
-  const area = document.querySelector("main");
+  const area = document.getElementById("relatorioPDF");
+  if (!area) {
+    mostrarToast("Erro ao gerar PDF");
+    return;
+  }
 
   const opt = {
-    margin: 8,
-    filename: "FastStile_Relatorio_Premium.pdf",
-    image: { type: "jpeg", quality: 0.98 },
-    html2canvas: { scale: 2, backgroundColor: "#ffffff" },
-    jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
+    margin: [15, 15, 15, 15],
+    filename: "FastStile_Financeiro_Premium.pdf",
+    image: { type: "jpeg", quality: 1 },
+    html2canvas: {
+      scale: 3,
+      backgroundColor: "#ffffff",
+      useCORS: true
+    },
+    jsPDF: {
+      unit: "mm",
+      format: "a4",
+      orientation: "portrait"
+    }
   };
 
   html2pdf().set(opt).from(area).save();
-}
-
-/* =========================
-   BACKUP
-========================= */
-
-function exportarBackup() {
-  if (bloquearPremium()) return;
-
-  const blob = new Blob([JSON.stringify(transacoes)], { type: "application/json" });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "faststile-backup.json";
-  a.click();
-}
-
-function importarBackup() {
-  if (bloquearPremium()) return;
-
-  const input = document.createElement("input");
-  input.type = "file";
-  input.accept = ".json";
-
-  input.onchange = e => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      try {
-        transacoes = JSON.parse(reader.result);
-        salvar();
-        render();
-        mostrarToast("✅ Backup importado com sucesso");
-      } catch {
-        mostrarToast("❌ Arquivo inválido");
-      }
-    };
-    reader.readAsText(file);
-  };
-
-  input.click();
-}
-
-function resetar() {
-  if (bloquearPremium()) return;
-
-  if (confirm("Deseja apagar todos os dados?")) {
-    localStorage.removeItem(STORAGE_KEY);
-    transacoes = [];
-    render();
-  }
 }
 
 /* =========================
@@ -274,11 +187,10 @@ function resetar() {
 ========================= */
 
 document.addEventListener("DOMContentLoaded", () => {
-  aplicarTema(localStorage.getItem(THEME_KEY) || "light");
   iniciarMensagem();
-  render();
+  atualizarResumo();
 
   if (!isLicenciado()) {
-    setTimeout(abrirLicenca, 800);
+    setTimeout(abrirLicenca, 700);
   }
 });
