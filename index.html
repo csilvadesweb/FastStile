@@ -2,140 +2,116 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-  <meta name="theme-color" content="#0f172a" />
-
-  <title>FastStile – Gestão Financeira Inteligente</title>
-
-  <!-- PWA -->
-  <link rel="manifest" href="manifest.json" />
-  <link rel="icon" href="icons/icon-192.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FastStile Financeiro</title>
 
   <!-- CSS -->
   <link rel="stylesheet" href="style.css" />
 
-  <!-- LIBS -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#0b2c3d" />
+
+  <!-- PDF -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 
-<body oncontextmenu="return false;">
+<body>
 
-<header>
-  <button id="theme-toggle" onclick="toggleTheme()" aria-label="Alternar Tema">🌓</button>
+  <!-- =========================
+       TOAST
+  ========================== -->
+  <div id="toast"></div>
 
-  <div class="header-content">
-    <h1>FastStile</h1>
-    <span class="badge">Original & Seguro</span>
+  <!-- =========================
+       MODAL LICENÇA
+  ========================== -->
+  <div id="modalLicenca" class="modal">
+    <div class="modal-content">
+      <h2>Ativar Licença Premium</h2>
+      <p>Digite sua chave para desbloquear recursos avançados.</p>
+
+      <input
+        type="text"
+        id="chaveLicenca"
+        placeholder="FS-2026-XXXX-XXXX"
+        autocomplete="off"
+      />
+
+      <button onclick="ativarLicenca()">Ativar Licença</button>
+    </div>
   </div>
-</header>
 
-<main>
+  <!-- =========================
+       CABEÇALHO
+  ========================== -->
+  <header>
+    <h1>FastStile</h1>
+    <p id="dicaFinanceira"></p>
+  </header>
 
-  <!-- MENSAGEM INTELIGENTE -->
-  <section class="insight-card">
-    <p id="dicaFinanceira">Carregando ambiente seguro...</p>
-  </section>
+  <!-- =========================
+       ÁREA PDF (PREMIUM)
+  ========================== -->
+  <main id="relatorioPDF">
 
-  <!-- RESUMO -->
-  <section class="cards">
-    <div class="card income">
-      <h3>Rendas</h3>
-      <p id="totalRenda">R$ 0,00</p>
-    </div>
+    <!-- RESUMO -->
+    <section class="resumo">
+      <div class="card">
+        <span>Rendas</span>
+        <strong id="totalRendas">R$ 0,00</strong>
+      </div>
 
-    <div class="card expense">
-      <h3>Despesas</h3>
-      <p id="totalDespesa">R$ 0,00</p>
-    </div>
+      <div class="card">
+        <span>Despesas</span>
+        <strong id="totalDespesas">R$ 0,00</strong>
+      </div>
 
-    <div class="card balance">
-      <h3>Saldo</h3>
-      <p id="saldoTotal">R$ 0,00</p>
-    </div>
-  </section>
+      <div class="card destaque">
+        <span>Saldo</span>
+        <strong id="saldo">R$ 0,00</strong>
+      </div>
+    </section>
 
-  <!-- FORM -->
-  <section class="form-section">
-    <div class="input-group">
-      <input id="descricao" type="text" placeholder="Descrição (ex: Salário)" autocomplete="off" />
-      <input id="valor" type="number" placeholder="Valor R$" />
-    </div>
+    <!-- FORMULÁRIO -->
+    <section class="formulario">
+      <input
+        type="text"
+        id="descricao"
+        placeholder="Descrição (ex: Salário, Aluguel)"
+      />
 
-    <div class="input-group">
-      <select id="tipo">
-        <option value="renda">Receita (+)</option>
-        <option value="despesa">Despesa (-)</option>
-      </select>
+      <input
+        type="number"
+        id="valor"
+        placeholder="Valor"
+        step="0.01"
+      />
 
-      <button class="btn-main" onclick="adicionar()">Salvar Registro</button>
-    </div>
-  </section>
+      <div class="acoes">
+        <button onclick="adicionarRegistro('entrada')" class="entrada">
+          + Receita
+        </button>
 
-  <!-- GRÁFICO -->
-  <section class="chart-section">
-    <canvas id="grafico"></canvas>
-  </section>
+        <button onclick="adicionarRegistro('saida')" class="saida">
+          − Despesa
+        </button>
+      </div>
+    </section>
 
-  <!-- LISTA -->
-  <section class="list-section">
-    <h2>Fluxo de Caixa</h2>
-    <ul id="lista"></ul>
-  </section>
+  </main>
 
-  <!-- AÇÕES -->
-  <section class="actions">
-    <button class="btn-pdf" onclick="exportarPDF()">PDF Premium 🔒</button>
-    <button onclick="exportarBackup()">Backup 🔒</button>
-    <button onclick="importarBackup()">Importar 🔒</button>
-    <button class="danger" onclick="resetar()">Resetar 🔒</button>
-  </section>
-
-  <!-- FOOTER -->
+  <!-- =========================
+       BOTÃO PDF
+  ========================== -->
   <footer>
-    <p>© 2026 FastStile · <a href="#" onclick="abrirPrivacidade()">Privacidade</a></p>
+    <button onclick="exportarPDF()" class="pdf">
+      Exportar PDF Premium
+    </button>
   </footer>
 
-</main>
-
-<!-- TOAST -->
-<div id="toast"></div>
-
-<!-- MODAL LICENÇA -->
-<div id="modalLicenca" class="modal">
-  <div class="modal-content">
-    <h3>Ativar Licença</h3>
-    <p>Digite sua chave de ativação</p>
-    <input id="chaveLicenca" placeholder="FS-2026-XXXX-XXXX" />
-    <button class="btn-main" onclick="ativarLicenca()">Ativar</button>
-    <button onclick="fecharLicenca()">Cancelar</button>
-  </div>
-</div>
-
-<!-- MODAL PRIVACIDADE -->
-<div id="modalPrivacidade" class="modal">
-  <div class="modal-content">
-    <h3>Privacidade & Segurança</h3>
-    <p>
-      ✔ Todos os dados ficam apenas neste dispositivo.<br>
-      ✔ Nenhuma informação é enviada para servidores.<br>
-      ✔ Aplicação protegida conforme Lei 9.609/98.
-    </p>
-    <button class="btn-main" onclick="fecharPrivacidade()">Entendi</button>
-  </div>
-</div>
-
-<!-- SCRIPTS -->
-<script src="script.js"></script>
-
-<script>
-  function abrirPrivacidade() {
-    document.getElementById("modalPrivacidade").style.display = "flex";
-  }
-  function fecharPrivacidade() {
-    document.getElementById("modalPrivacidade").style.display = "none";
-  }
-</script>
+  <!-- JS -->
+  <script src="script.js"></script>
 
 </body>
 </html>
