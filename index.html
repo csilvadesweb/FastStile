@@ -6,7 +6,7 @@
   <title>FastStile Finance Pro</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0b2c3d">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="stylesheet" href="style.css">
 </head>
@@ -15,7 +15,7 @@
 <header class="topo">
   <div class="header-wrapper">
     <div class="header-actions">
-      <button id="theme-toggle" onclick="toggleTheme()" class="btn-icon" title="Alternar Tema">🌓</button>
+      <button id="theme-toggle" onclick="toggleTheme()" class="btn-icon">🌓</button>
       <button class="btn-premium-toggle" onclick="abrirLicenca()" id="btnPremiumStatus">⭐ Ativar Premium</button>
     </div>
     <div class="header-content">
@@ -26,130 +26,80 @@
 </header>
 
 <main class="container">
-  <div class="main-grid">
-    <div class="col-left">
-      <section class="card dashboard">
-        <div class="chart-container">
-          <canvas id="graficoFinanceiro"></canvas>
-          <div class="chart-center-text"><span id="saldoPercent">0%</span></div>
-        </div>
-        <div class="resumo-mini">
-          <div class="item-resumo">
-            <span class="dot receita"></span>
-            <div><small>Rendas</small><strong id="totalRendas">R$ 0,00</strong></div>
-          </div>
-          <div class="item-resumo">
-            <span class="dot despesa"></span>
-            <div><small>Despesas</small><strong id="totalDespesas">R$ 0,00</strong></div>
-          </div>
-          <div class="item-resumo total">
-            <div><small>Saldo Geral</small><strong id="saldoTotal">R$ 0,00</strong></div>
-          </div>
-        </div>
-      </section>
-
-      <section class="card formulario">
-        <h3>Novo Lançamento</h3>
-        <div class="input-group">
-          <input type="text" id="descricao" placeholder="Descrição (ex: Mercado)" autocomplete="off" />
-          <input type="number" id="valor" placeholder="0,00" step="0.01" inputmode="decimal" />
-        </div>
-        <div class="botoes-tipo">
-          <button class="btn-tipo" onclick="setTipo('receita')" id="btnReceita">＋ Receita</button>
-          <button class="btn-tipo" onclick="setTipo('despesa')" id="btnDespesa">－ Despesa</button>
-        </div>
-        <button class="btn-adicionar" onclick="salvarTransacao()">Confirmar Lançamento</button>
-      </section>
+  <section class="card dashboard">
+    <div class="chart-container">
+      <canvas id="graficoFinanceiro"></canvas>
+      <div class="chart-center-text"><span id="saldoPercent">0%</span></div>
     </div>
-
-    <div class="col-right">
-      <section class="card extrato">
-        <div class="extrato-header">
-          <h3>Histórico</h3>
-          <div id="miniConverter" class="mini-converter">USD: R$ 0,00</div>
-        </div>
-        <div class="lista-wrapper">
-          <ul id="listaTransacoes"></ul>
-        </div>
-      </section>
-
-      <section class="ferramentas-grid">
-        <button onclick="gerarPDF()" class="tool-card">
-          <span class="tool-icon">📄</span><span class="tool-label">PDF</span>
-        </button>
-        <button onclick="exportarBackup()" class="tool-card">
-          <span class="tool-icon">☁️</span><span class="tool-label">Backup</span>
-        </button>
-        <button onclick="document.getElementById('inputImportar').click()" class="tool-card">
-          <span class="tool-icon">📥</span><span class="tool-label">Importar</span>
-        </button>
-        <input type="file" id="inputImportar" style="display: none;" accept=".json" onchange="processarImportacao(event)">
-        <button onclick="abrirConfirmacao('limpar')" class="tool-card danger">
-          <span class="tool-icon">🗑️</span><span class="tool-label">Limpar</span>
-        </button>
-      </section>
+    <div class="resumo-mini">
+      <div class="item-resumo">
+        <span><span class="dot receita"></span> Rendas</span>
+        <strong id="totalRendas">R$ 0,00</strong>
+      </div>
+      <div class="item-resumo">
+        <span><span class="dot despesa"></span> Despesas</span>
+        <strong id="totalDespesas">R$ 0,00</strong>
+      </div>
+      <div class="item-resumo total-line">
+        <span>Saldo Geral</span>
+        <strong id="saldoTotal">R$ 0,00</strong>
+      </div>
     </div>
-  </div>
+  </section>
+
+  <section class="card formulario">
+    <h3>Novo Lançamento</h3>
+    <div class="input-group">
+      <input type="text" id="descricao" placeholder="Descrição" autocomplete="off" />
+      <input type="number" id="valor" placeholder="0,00" step="0.01" inputmode="decimal" />
+    </div>
+    <div class="botoes-tipo">
+      <button class="btn-tipo" onclick="setTipo('receita')" id="btnReceita">＋ Receita</button>
+      <button class="btn-tipo" onclick="setTipo('despesa')" id="btnDespesa">－ Despesa</button>
+    </div>
+    <button class="btn-adicionar" onclick="salvarTransacao()">Confirmar Lançamento</button>
+  </section>
+
+  <section class="card extrato">
+    <div class="extrato-header">
+      <h3>Histórico</h3>
+      <small id="miniConverter">Carregando câmbio...</small>
+    </div>
+    <ul id="listaTransacoes"></ul>
+  </section>
+
+  <section class="ferramentas-grid">
+    <button onclick="gerarPDF()" class="tool-card">📄 PDF</button>
+    <button onclick="exportarBackup()" class="tool-card">☁️ Backup</button>
+    <button onclick="document.getElementById('inputImportar').click()" class="tool-card">📥 Importar</button>
+    <input type="file" id="inputImportar" style="display: none;" onchange="processarImportacao(event)">
+    <button onclick="abrirConfirmacao('limpar')" class="tool-card danger-text">🗑️ Limpar</button>
+  </section>
 </main>
 
-<!-- MODAL LICENÇA PREMIUM -->
 <div id="modalLicenca" class="modal">
   <div class="modal-content premium-box">
-    <div class="premium-header">
-      <span class="premium-icon-diamond">💎</span>
-      <h2>Ativar Licença PRO</h2>
-      <p>Acesse relatórios e backup ilimitado.</p>
-    </div>
-    <div class="premium-field">
-      <input type="text" id="chaveLicenca" placeholder="FS-2026-XXXX-XXXX" spellcheck="false">
-    </div>
-    <div class="modal-btn-stack">
-      <button class="btn-activate-pro" onclick="ativarLicenca()">Validar Chave</button>
-      <button class="btn-close-modal" onclick="fecharLicenca()">Voltar</button>
-    </div>
+    <span class="diamond-icon">💎</span>
+    <h2>Ativar Licença</h2>
+    <input type="text" id="chaveLicenca" placeholder="FS-2026-XXXX-XXXX">
+    <button class="btn-adicionar" onclick="ativarLicenca()">Validar Chave</button>
+    <button onclick="fecharLicenca()" class="btn-back">Voltar</button>
   </div>
 </div>
 
-<!-- MODAL CONFIRMAÇÃO -->
 <div id="modalConfirmacao" class="modal">
-  <div class="modal-content confirm-box">
-    <div class="confirm-icon">⚠️</div>
-    <h2>FastStile diz:</h2>
-    <p id="confirmMessage">Deseja realizar esta ação?</p>
-    <div class="confirm-actions">
-      <button id="btnConfirmarAcao" class="btn-confirm-yes">Confirmar</button>
-      <button onclick="fecharConfirmacao()" class="btn-confirm-no">Cancelar</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL POLÍTICA DE PRIVACIDADE -->
-<div id="modalPrivacidade" class="modal">
   <div class="modal-content">
-    <h2>Política de Privacidade</h2>
-    <p>
-      Este aplicativo coleta apenas dados locais do seu dispositivo para controle financeiro.
-      Nenhuma informação é enviada a servidores externos sem consentimento. 
-      Para dúvidas ou contato, envie e-mail para: 
-      <a href="mailto:csdesweb@gmail.com">csdesweb@gmail.com</a>
-    </p>
-    <button onclick="fecharPrivacidade()" class="btn-close-modal">Fechar</button>
+    <h2>Atenção</h2>
+    <p id="confirmMessage">Deseja realizar esta ação?</p>
+    <div class="confirm-btns">
+      <button id="btnConfirmarAcao" class="btn-adicionar">Confirmar</button>
+      <button onclick="fecharConfirmacao()" class="btn-tipo">Cancelar</button>
+    </div>
   </div>
 </div>
 
 <div id="toast"></div>
 
-<footer>
-  <p>
-    <a href="javascript:void(0)" onclick="abrirPrivacidade()">Política de Privacidade</a>
-  </p>
-</footer>
-
 <script src="script.js"></script>
-<script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js');
-  }
-</script>
 </body>
 </html>
