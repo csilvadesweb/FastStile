@@ -4,8 +4,7 @@ const ASSETS = [
   './index.html',
   './style.css',
   './script.js',
-  './manifest.json',
-  'https://cdn.jsdelivr.net/npm/chart.js'
+  './manifest.json'
 ];
 
 self.addEventListener('install', (e) => {
