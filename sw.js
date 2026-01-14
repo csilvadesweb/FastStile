@@ -1,6 +1,6 @@
 "use strict";
 
-const CACHE_NAME = 'faststile-pro-v4';
+const CACHE_NAME = 'faststile-pwa-v5'; // Versão atualizada para forçar refresh
 const ASSETS = [
   './',
   './index.html',
@@ -13,25 +13,30 @@ const ASSETS = [
   'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js'
 ];
 
+// Instala e força a ativação
 self.addEventListener('install', (e) => {
+  self.skipWaiting(); 
   e.waitUntil(
     caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
   );
-  self.skipWaiting();
 });
 
+// Remove caches antigos e assume controle
 self.addEventListener('activate', (e) => {
   e.waitUntil(
     caches.keys().then(keys => Promise.all(
-      keys.map(key => key !== CACHE_NAME ? caches.delete(key) : null)
+      keys.map(key => {
+        if (key !== CACHE_NAME) return caches.delete(key);
+      })
     ))
   );
-  self.clients.claim();
+  return self.clients.claim();
 });
 
+// Estratégia Network-First para garantir que dados novos (como premium) funcionem
 self.addEventListener('fetch', (e) => {
   if (e.request.url.includes('awesomeapi')) return;
   e.respondWith(
-    caches.match(e.request).then(res => res || fetch(e.request))
+    fetch(e.request).catch(() => caches.match(e.request))
   );
 });
