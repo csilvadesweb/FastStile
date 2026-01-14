@@ -22,71 +22,77 @@
 <header class="topo">
   <div class="header-wrapper">
     <div class="header-actions">
-      <button onclick="toggleTheme()" class="btn-icon">🌓</button>
-      <button class="btn-premium-toggle" onclick="abrirLicenca()" id="btnPremiumStatus">⭐ Ativar Premium</button>
+      <button class="btn-icon" onclick="toggleTheme()">🌓</button>
+      <button id="btnPremiumStatus" class="btn-premium-toggle" onclick="abrirLicenca()">🔓 Ativar PRO</button>
     </div>
-    <div class="header-content">
-      <h1>FastStile <span class="badge-pro">PRO</span></h1>
-      <p>Gestão Financeira Privada</p>
+    <div id="miniConverter" class="cambio-tag">Carregando câmbio...</div>
+    <div class="saldo-principal">
+      <p>Saldo Geral</p>
+      <h1 id="saldoTotal">R$ 0,00</h1>
     </div>
   </div>
 </header>
 
 <main class="container">
-  <section class="card dashboard">
+  <div class="card dashboard">
     <div class="chart-container">
       <canvas id="graficoFinanceiro"></canvas>
       <div class="chart-center-text" id="saldoPercent">0%</div>
     </div>
     <div class="resumo-mini">
-      <div class="item-resumo"><span>Rendas</span><strong id="totalRendas" class="text-success">R$ 0,00</strong></div>
-      <div class="item-resumo"><span>Gastos</span><strong id="totalDespesas" class="text-danger">R$ 0,00</strong></div>
-      <div class="item-resumo total-line"><span>Saldo</span><strong id="saldoTotal">R$ 0,00</strong></div>
+      <div class="item-resumo">
+        <span>Receitas</span>
+        <strong id="totalRendas" style="color: var(--accent)">R$ 0,00</strong>
+      </div>
+      <div class="item-resumo">
+        <span>Despesas</span>
+        <strong id="totalDespesas" style="color: var(--danger)">R$ 0,00</strong>
+      </div>
+      <div class="total-line"></div>
     </div>
-  </section>
+  </div>
 
-  <section class="card formulario no-print">
+  <div class="card">
     <div class="input-group">
-      <input type="text" id="descricao" placeholder="Descrição" />
-      <input type="number" id="valor" placeholder="0,00" inputmode="decimal" />
+      <input type="text" id="descricao" placeholder="Descrição (ex: Aluguel)">
+      <input type="number" id="valor" placeholder="0,00" step="0.01">
     </div>
     <div class="botoes-tipo">
-      <button class="btn-tipo" onclick="setTipo('receita')" id="btnReceita">Receita</button>
-      <button class="btn-tipo" onclick="setTipo('despesa')" id="btnDespesa">Despesa</button>
+      <button id="btnReceita" class="btn-tipo" onclick="setTipo('receita')">↑ Receita</button>
+      <button id="btnDespesa" class="btn-tipo" onclick="setTipo('despesa')">↓ Despesa</button>
     </div>
-    <button class="btn-adicionar" onclick="salvarTransacao()">Confirmar Lançamento</button>
-  </section>
-
-  <section class="card extrato">
-    <div class="extrato-header">
-      <h3>Atividades</h3>
-      <small id="miniConverter">Sincronizando...</small>
-    </div>
-    <ul id="listaTransacoes"></ul>
-  </section>
-
-  <div class="ferramentas-grid no-print">
-    <button onclick="gerarPDF()" class="tool-card btn-pdf">📄 PDF Profissional</button>
-    <button onclick="exportarBackup()" class="tool-card btn-backup">📤 Backup Dados</button>
-    <button onclick="tentarImportar()" class="tool-card btn-restore">📥 Restaurar</button>
-    <button onclick="abrirConfirmacao('limpar')" class="tool-card danger">🗑️ Resetar</button>
-    
-    <a href="privacy.html" class="tool-card btn-privacy" style="grid-column: span 2; text-decoration: none; display: flex; align-items: center; justify-content: center;">🔒 Política de Privacidade</a>
-    
-    <input type="file" id="inputImport" style="display:none" accept=".json" onchange="importarBackup(event)">
+    <button class="btn-adicionar" onclick="salvarTransacao()">Lançar Transação</button>
   </div>
-  
-  <p style="text-align: center; font-size: 11px; opacity: 0.5; margin-top: 20px;">© 2026 FastStile Pro</p>
+
+  <div class="ferramentas-grid">
+    <button class="tool-card btn-pdf" onclick="gerarPDF()">
+      <span>📄</span> Gerar Extrato PDF
+    </button>
+    <button class="tool-card btn-backup" onclick="exportarBackup()">
+      <span>📦</span> Backup de Dados
+    </button>
+    <button class="tool-card btn-restore" onclick="tentarImportar()">
+      <span>📥</span> Restaurar Backup
+    </button>
+    <button class="tool-card danger" onclick="abrirConfirmacao('limpar')">
+      <span>🗑️</span> Limpar App
+    </button>
+    <a href="privacy.html" class="tool-card btn-privacy">Termos & Privacidade</a>
+  </div>
+
+  <input type="file" id="inputImport" style="display:none" accept=".faststile" onchange="importarBackup(event)">
+
+  <ul id="listaTransacoes" style="list-style:none; margin-top:20px;"></ul>
 </main>
 
 <div id="modalLicenca" class="modal">
   <div class="modal-content">
     <span class="premium-icon">💎</span>
     <h2>Ativar Versão PRO</h2>
-    <p>Libere backups e relatórios profissionais.</p>
-    <input type="text" id="chaveLicenca" placeholder="FS-2026-XXXX-XXXX">
+    <p>Libere backups criptografados e extratos bancários profissionais.</p>
+    <input type="text" id="chaveLicenca" placeholder="FS-2026-XXXX-XXXX" style="text-align:center; margin: 15px 0;">
     <button class="btn-adicionar" onclick="ativarLicenca()">Validar Chave</button>
-    <button class="btn-link" onclick="fecharLicenca()" style="background:none; border:none; margin-top:15px; color:var(--text-sub); cursor:pointer;">Voltar</button>
+    <button onclick="fecharLicenca()" style="background:none; border:none; margin-top:15px; color:var(--text-sub); cursor:pointer;">Voltar</button>
   </div>
 </div>
 
@@ -95,8 +101,8 @@
       <h2>Atenção</h2>
       <p>Deseja limpar todos os dados do dispositivo?</p>
       <div style="display:flex; gap:10px; margin-top:20px">
-        <button id="btnConfirmarAcao" style="flex:1; padding:15px; border-radius:12px; border:none; background:var(--danger); color:white; cursor:pointer;">Sim, apagar</button>
-        <button onclick="fecharConfirmacao()" style="flex:1; padding:15px; border-radius:12px; border:none; background:var(--border); cursor:pointer;">Cancelar</button>
+        <button id="btnConfirmarAcao" style="flex:1; padding:15px; border-radius:12px; border:none; background:var(--danger); color:white; cursor:pointer;">Sim</button>
+        <button onclick="fecharConfirmacao()" style="flex:1; padding:15px; border-radius:12px; border:none; background:var(--border); cursor:pointer;">Não</button>
       </div>
     </div>
 </div>
@@ -105,14 +111,5 @@
 <div id="pdf-template" style="display:none; position: absolute; left: -9999px;"></div>
 
 <script src="script.js"></script>
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js')
-        .then(reg => console.log('FastStile PWA: Ativo'))
-        .catch(err => console.error('Erro PWA:', err));
-    });
-  }
-</script>
 </body>
 </html>
