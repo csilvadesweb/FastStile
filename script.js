@@ -68,7 +68,6 @@ function render() {
 
 function gerarPDF() {
     if (localStorage.getItem(PREMIUM_KEY) !== "true") { abrirLicenca(); return; }
-    
     const renderArea = document.getElementById("pdf-render-area");
     renderArea.style.display = "block";
     
@@ -76,64 +75,54 @@ function gerarPDF() {
     transacoes.forEach(t => t.tipo === 'receita' ? r += t.valor : d += t.valor);
 
     renderArea.innerHTML = `
-        <div style="padding:50px; background:white; font-family:sans-serif; color:#1e293b;">
-            <div style="background:#0f172a; color:white; padding:40px; border-radius:15px; margin-bottom:40px;">
-                <h1 style="margin:0; font-size:32px; letter-spacing:-1px;">FastStilecs Elite</h1>
-                <p style="margin:5px 0 0; opacity:0.8; font-size:14px;">RELATÓRIO FINANCEIRO EXECUTIVO</p>
-                <div style="margin-top:20px; font-size:12px; opacity:0.6;">
-                    ID: FASTSTILECS-2026-PRO-SECURITY-BY-CSILVA<br>
-                    Gerado em: ${new Date().toLocaleString('pt-BR')}
-                </div>
+        <div style="padding:40px; background:white; font-family:sans-serif;">
+            <h1 style="color:#0f172a">Relatório FastStile Pro</h1>
+            <p>Gerado em: ${new Date().toLocaleString('pt-BR')}</p>
+            <hr>
+            <div style="margin:20px 0; display:flex; gap:20px">
+                <p><b>Receitas:</b> R$ ${r.toLocaleString('pt-BR')}</p>
+                <p><b>Despesas:</b> R$ ${d.toLocaleString('pt-BR')}</p>
+                <p><b>Saldo:</b> R$ ${(r-d).toLocaleString('pt-BR')}</p>
             </div>
-            
-            <div style="display:flex; gap:20px; margin-bottom:40px;">
-                <div style="flex:1; border:1px solid #e2e8f0; padding:20px; border-radius:12px;">
-                    <span style="font-size:12px; color:#64748b; display:block; margin-bottom:5px;">Receitas</span>
-                    <b style="font-size:20px; color:#10b981;">R$ ${r.toLocaleString('pt-BR')}</b>
-                </div>
-                <div style="flex:1; border:1px solid #e2e8f0; padding:20px; border-radius:12px;">
-                    <span style="font-size:12px; color:#64748b; display:block; margin-bottom:5px;">Despesas</span>
-                    <b style="font-size:20px; color:#f43f5e;">R$ ${d.toLocaleString('pt-BR')}</b>
-                </div>
-                <div style="flex:1; background:#f8fafc; padding:20px; border-radius:12px;">
-                    <span style="font-size:12px; color:#64748b; display:block; margin-bottom:5px;">Saldo Final</span>
-                    <b style="font-size:20px; color:#0f172a;">R$ ${(r-d).toLocaleString('pt-BR')}</b>
-                </div>
-            </div>
-
             <table style="width:100%; border-collapse:collapse;">
-                <thead>
-                    <tr style="background:#0f172a; color:white;">
-                        <th style="padding:15px; text-align:left; font-size:12px; border-radius:8px 0 0 0;">DATA</th>
-                        <th style="padding:15px; text-align:left; font-size:12px;">DESCRIÇÃO</th>
-                        <th style="padding:15px; text-align:center; font-size:12px;">TIPO</th>
-                        <th style="padding:15px; text-align:right; font-size:12px; border-radius:0 8px 0 0;">VALOR (R$)</th>
-                    </tr>
-                </thead>
+                <thead><tr style="background:#f1f5f9"><th style="padding:10px;text-align:left">Data</th><th style="padding:10px;text-align:left">Descrição</th><th style="padding:10px;text-align:right">Valor</th></tr></thead>
                 <tbody>
-                    ${transacoes.map((t, i) => `
-                        <tr style="background:${i % 2 === 0 ? '#ffffff' : '#f8fafc'}; border-bottom:1px solid #f1f5f9;">
-                            <td style="padding:15px; font-size:13px; color:#64748b;">${t.data}</td>
-                            <td style="padding:15px; font-size:13px; font-weight:600;">${t.desc.toUpperCase()}</td>
-                            <td style="padding:15px; font-size:11px; text-align:center; color:#94a3b8;">${t.tipo === 'receita' ? 'ENTRADA' : 'SAÍDA'}</td>
-                            <td style="padding:15px; text-align:right; font-weight:700; color:${t.tipo === 'receita' ? '#10b981' : '#f43f5e'}">
-                                ${t.tipo === 'receita' ? '+ ' : '- '}${t.valor.toLocaleString('pt-BR')}
-                            </td>
-                        </tr>
-                    `).join('')}
+                    ${transacoes.map(t => `<tr><td style="padding:10px">${t.data}</td><td style="padding:10px">${t.desc}</td><td style="padding:10px;text-align:right">R$ ${t.valor.toLocaleString('pt-BR')}</td></tr>`).join('')}
                 </tbody>
             </table>
-            <div style="text-align:center; margin-top:50px; font-size:10px; color:#94a3b8; border-top:1px solid #f1f5f9; padding-top:20px;">
-                2026 FastStilecs - Propriedade Intelectual Exclusiva de C. Silva.
-            </div>
         </div>`;
 
-    const opt = { margin: 0, filename: 'Relatorio_FastStile_Elite.pdf', html2canvas: { scale: 3 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } };
-    
-    toast("Gerando PDF Elite...");
-    html2pdf().set(opt).from(renderArea).save().then(() => {
+    html2pdf().set({ margin: 10, filename: 'Relatorio.pdf', html2canvas: { scale: 2 } }).from(renderArea).save().then(() => {
         renderArea.style.display = "none";
     });
+}
+
+function exportarBackup() {
+    if (localStorage.getItem(PREMIUM_KEY) !== "true") { abrirLicenca(); return; }
+    const blob = new Blob([JSON.stringify(transacoes)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `backup_faststile_${Date.now()}.json`;
+    a.click();
+}
+
+function importarBackup(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        try {
+            const data = JSON.parse(e.target.result);
+            if (Array.isArray(data)) {
+                transacoes = data;
+                localStorage.setItem(DB_KEY, JSON.stringify(transacoes));
+                render();
+                toast("Backup restaurado!");
+            }
+        } catch { toast("Arquivo inválido"); }
+    };
+    reader.readAsText(file);
 }
 
 function atualizarGrafico(r, d) {
