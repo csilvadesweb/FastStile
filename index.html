@@ -42,7 +42,7 @@
 
   <section class="card formulario no-print">
     <div class="input-group">
-      <input type="text" id="descricao" placeholder="Descrição (ex: Aluguel)" />
+      <input type="text" id="descricao" placeholder="Descrição" />
       <input type="number" id="valor" placeholder="0,00" inputmode="decimal" />
     </div>
     <div class="botoes-tipo">
@@ -62,8 +62,12 @@
   </section>
 
   <div class="ferramentas-grid no-print">
-    <button onclick="gerarPDF()" class="tool-card">📄 Relatório Elite PDF</button>
-    <button onclick="abrirConfirmacao('limpar')" class="tool-card danger">🗑️ Resetar App</button>
+    <button onclick="gerarPDF()" class="tool-card">📄 Relatório PDF</button>
+    <button onclick="exportarBackup()" class="tool-card">📤 Backup</button>
+    <button onclick="document.getElementById('inputImport').click()" class="tool-card">📥 Restaurar</button>
+    <button onclick="abrirConfirmacao('limpar')" class="tool-card danger">🗑️ Resetar</button>
+    
+    <input type="file" id="inputImport" style="display:none" accept=".json" onchange="importarBackup(event)">
   </div>
 </main>
 
