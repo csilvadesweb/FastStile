@@ -53,7 +53,7 @@ function removerItem(id) {
     render();
 }
 
-// --- FUNÇÕES PREMIUM: BACKUP E PDF ---
+// --- FUNÇÕES PREMIUM ---
 function exportarBackup() {
     if (localStorage.getItem(PREMIUM_KEY) !== "true") { abrirLicenca(); return; }
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(transacoes));
@@ -131,7 +131,6 @@ function render() {
     transacoes.forEach(t => {
         if (t.tipo === 'receita') r += t.valor; else d += t.valor;
         const li = document.createElement("li");
-        li.className = "transacao-item";
         li.innerHTML = `
             <div style="display:flex; justify-content:space-between; align-items:center; padding:15px 0; border-bottom:1px solid var(--border);">
                 <div><div style="font-weight:700;">${t.desc}</div><div style="font-size:11px; color:var(--text-sub)">${t.data}</div></div>
