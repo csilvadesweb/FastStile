@@ -25,7 +25,7 @@ function premiumGuard(cb) {
   cb();
 }
 
-/* ================= PDF BANCÁRIO ================= */
+/* ================= PDF (DOWNLOAD ONLY) ================= */
 function gerarPDF() {
   premiumGuard(() => {
 
@@ -38,46 +38,47 @@ function gerarPDF() {
         <tr>
           <td>${t.data}</td>
           <td>${t.desc}</td>
-          <td class="${t.tipo}">
+          <td style="text-align:right;color:${t.tipo === "receita" ? "#10b981" : "#f43f5e"}">
             ${t.tipo === "receita" ? "+" : "-"}
-            ${t.valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+            ${t.valor.toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}
           </td>
         </tr>`;
     }).join("");
 
     const html = `
-    <div style="font-family: Arial, sans-serif; color:#0f172a; padding:30px;">
+    <div style="font-family:Arial,sans-serif;color:#0f172a;padding:24px;">
       <h2 style="margin:0;">FastStile Finance Pro</h2>
-      <p style="margin:2px 0 20px;font-size:12px;">
-        Extrato Financeiro • Emitido em ${hoje}
+      <p style="margin:4px 0 16px;font-size:12px;">
+        Extrato Financeiro • Gerado em ${hoje}
       </p>
 
-      <table style="width:100%; border-collapse:collapse; font-size:12px;">
+      <table style="width:100%;border-collapse:collapse;font-size:12px;">
         <thead>
           <tr style="background:#f1f5f9;">
             <th style="padding:8px;border:1px solid #e2e8f0;">Data</th>
             <th style="padding:8px;border:1px solid #e2e8f0;">Descrição</th>
-            <th style="padding:8px;border:1px solid #e2e8f0;">Valor</th>
+            <th style="padding:8px;border:1px solid #e2e8f0;text-align:right;">Valor</th>
           </tr>
         </thead>
         <tbody>
           ${linhas || `
-          <tr>
-            <td colspan="3" style="padding:20px;text-align:center;">
-              Nenhuma movimentação registrada
-            </td>
-          </tr>`}
+            <tr>
+              <td colspan="3" style="padding:20px;text-align:center;">
+                Nenhuma movimentação registrada
+              </td>
+            </tr>
+          `}
         </tbody>
       </table>
 
-      <div style="margin-top:20px; font-size:13px;">
-        <p><strong>Total de Entradas:</strong> ${totalR.toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}</p>
-        <p><strong>Total de Saídas:</strong> ${totalD.toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}</p>
-        <p><strong>Saldo Final:</strong> ${(totalR-totalD).toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}</p>
+      <div style="margin-top:16px;font-size:12px;">
+        <p><strong>Entradas:</strong> ${totalR.toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}</p>
+        <p><strong>Saídas:</strong> ${totalD.toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}</p>
+        <p><strong>Saldo:</strong> ${(totalR-totalD).toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}</p>
       </div>
 
-      <p style="margin-top:30px;font-size:10px;color:#64748b;">
-        Documento gerado automaticamente • FastStile Finance Pro
+      <p style="margin-top:24px;font-size:10px;color:#64748b;">
+        Arquivo gerado automaticamente • FastStile Finance Pro
       </p>
     </div>`;
 
@@ -85,18 +86,15 @@ function gerarPDF() {
     container.innerHTML = html;
 
     html2pdf().set({
-      margin: 10,
+      margin: 8,
       filename: "extrato-faststile.pdf",
-      html2canvas: { scale: 3, useCORS: true },
+      html2canvas: { scale: 2 }, // otimizado para download
       jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
     }).from(container).save();
 
-    toast("Extrato bancário gerado");
+    toast("PDF baixado com sucesso");
   });
 }
 
 /* ================= RESTANTE DO APP ================= */
-/* Tema, render, gráfico, backup, restore, licença, toast */
-/* — permanecem exatamente iguais para regressão zero */
-
-/* (Demais funções já existentes continuam aqui sem alterações) */
+/* Todo o restante permanece exatamente igual (tema, render, gráfico, backup, licença, toast…) */
