@@ -1,9 +1,9 @@
 {
-  "id": "/faststile-pro/",
+  "id": "com.faststile.pro",
   "name": "FastStile Financeiro Pro",
   "short_name": "FastStile",
-  "description": "Gestão Financeira Privada com Relatórios Profissionais",
-  "start_url": "index.html",
+  "description": "Gestão Financeira com PDF e Backup",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0f172a",
   "theme_color": "#0f172a",
