@@ -4,14 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>FastStile Finance Pro</title>
-  
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0f172a">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="FastStile">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
-
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -47,7 +42,7 @@
 
   <section class="card formulario no-print">
     <div class="input-group">
-      <input type="text" id="descricao" placeholder="Descrição" />
+      <input type="text" id="descricao" placeholder="Descrição (ex: Aluguel)" />
       <input type="number" id="valor" placeholder="0,00" inputmode="decimal" />
     </div>
     <div class="botoes-tipo">
@@ -63,30 +58,24 @@
       <small id="miniConverter">Sincronizando...</small>
     </div>
     <ul id="listaTransacoes"></ul>
+    <footer class="footer-app"><a href="privacy.html">Política de Privacidade</a><p>© 2026 FastStile Pro</p></footer>
   </section>
 
   <div class="ferramentas-grid no-print">
-    <button onclick="gerarPDF()" class="tool-card btn-pdf">📄 PDF Profissional</button>
-    <button onclick="exportarBackup()" class="tool-card btn-backup">📤 Backup Dados</button>
-    <button onclick="tentarImportar()" class="tool-card btn-restore">📥 Restaurar</button>
-    <button onclick="abrirConfirmacao('limpar')" class="tool-card danger">🗑️ Resetar</button>
-    
-    <a href="privacy.html" class="tool-card btn-privacy" style="grid-column: span 2; text-decoration: none; display: flex; align-items: center; justify-content: center;">🔒 Política de Privacidade</a>
-    
-    <input type="file" id="inputImport" style="display:none" accept=".json" onchange="importarBackup(event)">
+    <button onclick="gerarPDF()" class="tool-card">📄 Relatório Elite PDF</button>
+    <button onclick="abrirConfirmacao('limpar')" class="tool-card danger">🗑️ Resetar App</button>
   </div>
-  
-  <p style="text-align: center; font-size: 11px; opacity: 0.5; margin-top: 20px;">© 2026 FastStile Pro</p>
 </main>
+
+<div id="pdf-render-area" style="display:none; position:absolute; left:-9999px; width:800px;"></div>
 
 <div id="modalLicenca" class="modal">
   <div class="modal-content">
     <span class="premium-icon">💎</span>
     <h2>Ativar Versão PRO</h2>
-    <p>Libere backups e relatórios profissionais.</p>
     <input type="text" id="chaveLicenca" placeholder="FS-2026-XXXX-XXXX">
     <button class="btn-adicionar" onclick="ativarLicenca()">Validar Chave</button>
-    <button class="btn-link" onclick="fecharLicenca()" style="background:none; border:none; margin-top:15px; color:var(--text-sub); cursor:pointer;">Voltar</button>
+    <button class="btn-link" onclick="fecharLicenca()" style="margin-top:10px; border:none; background:none; color:var(--text-sub); cursor:pointer;">Voltar</button>
   </div>
 </div>
 
@@ -94,24 +83,18 @@
     <div class="modal-content">
       <h2>Atenção</h2>
       <p>Deseja limpar todos os dados do dispositivo?</p>
-      <div style="display:flex; gap:10px; margin-top:20px">
-        <button id="btnConfirmarAcao" style="flex:1; padding:15px; border-radius:12px; border:none; background:var(--danger); color:white; cursor:pointer;">Sim, apagar</button>
-        <button onclick="fecharConfirmacao()" style="flex:1; padding:15px; border-radius:12px; border:none; background:var(--border); cursor:pointer;">Cancelar</button>
+      <div style="display:flex; gap:10px; margin-top:20px;">
+        <button id="btnConfirmarAcao" style="flex:1; padding:15px; border-radius:12px; background:var(--danger); color:white; border:none; cursor:pointer;">Sim, apagar</button>
+        <button onclick="fecharConfirmacao()" style="flex:1; padding:15px; border-radius:12px; background:var(--border); border:none; cursor:pointer;">Não</button>
       </div>
     </div>
 </div>
 
 <div id="toast"></div>
-<div id="pdf-template" style="display:none; position: absolute; left: -9999px;"></div>
-
 <script src="script.js"></script>
 <script>
   if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js')
-        .then(reg => console.log('FastStile PWA: Ativo'))
-        .catch(err => console.error('Erro PWA:', err));
-    });
+    navigator.serviceWorker.register('./sw.js');
   }
 </script>
 </body>
