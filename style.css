@@ -36,10 +36,8 @@ input { background: var(--bg); border: 1px solid var(--border); color: var(--tex
 
 .btn-adicionar { width: 100%; padding: 18px; border-radius: 18px; border: none; background: var(--primary); color: white; font-weight: 800; cursor: pointer; }
 
-/* Grid de Ferramentas Colorido */
-.ferramentas-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.tool-card { padding: 15px; border-radius: 20px; border: none; color: white; font-weight: 700; font-size: 12px; cursor: pointer; transition: transform 0.1s; text-align: center; }
-.tool-card:active { transform: scale(0.95); }
+.ferramentas-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; }
+.tool-card { padding: 15px; border-radius: 20px; border: none; color: white; font-weight: 700; font-size: 12px; cursor: pointer; text-align: center; }
 .btn-pdf { background: var(--blue); }
 .btn-backup { background: var(--accent); }
 .btn-restore { background: var(--primary); }
