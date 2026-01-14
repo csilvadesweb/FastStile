@@ -63,7 +63,6 @@
       <small id="miniConverter">Sincronizando...</small>
     </div>
     <ul id="listaTransacoes"></ul>
-    <footer class="footer-app"><a href="privacy.html">Privacidade</a><p>© 2026 FastStile Pro</p></footer>
   </section>
 
   <div class="ferramentas-grid no-print">
@@ -71,8 +70,13 @@
     <button onclick="exportarBackup()" class="tool-card btn-backup">📤 Backup Dados</button>
     <button onclick="document.getElementById('inputImport').click()" class="tool-card btn-restore">📥 Restaurar</button>
     <button onclick="abrirConfirmacao('limpar')" class="tool-card danger">🗑️ Resetar</button>
+    
+    <a href="privacy.html" class="tool-card btn-privacy" style="grid-column: span 2; text-decoration: none; display: flex; align-items: center; justify-content: center;">🔒 Política de Privacidade</a>
+    
     <input type="file" id="inputImport" style="display:none" accept=".json" onchange="importarBackup(event)">
   </div>
+  
+  <p style="text-align: center; font-size: 11px; opacity: 0.5; margin-top: 20px;">© 2026 FastStile Pro</p>
 </main>
 
 <div id="pdf-template" style="display:none; position: absolute; left: -9999px;"></div>
