@@ -27,7 +27,7 @@
 </header>
 
 <main class="container">
-  <section class="card dashboard" id="section-print">
+  <section class="card dashboard">
     <div class="chart-container">
       <canvas id="graficoFinanceiro"></canvas>
       <div class="chart-center-text" id="saldoPercent">0%</div>
@@ -61,10 +61,15 @@
   </section>
 
   <div class="ferramentas-grid no-print">
-    <button onclick="gerarPDF()" class="tool-card">📄 Relatório PDF</button>
+    <button onclick="gerarPDF()" class="tool-card btn-pdf">📄 Gerar PDF Bancário</button>
+    <button onclick="exportarBackup()" class="tool-card btn-backup">📤 Exportar Backup</button>
+    <button onclick="document.getElementById('inputImport').click()" class="tool-card btn-restore">📥 Restaurar Dados</button>
     <button onclick="abrirConfirmacao('limpar')" class="tool-card danger">🗑️ Resetar App</button>
+    <input type="file" id="inputImport" style="display:none" accept=".json" onchange="importarBackup(event)">
   </div>
 </main>
+
+<div id="pdf-template" style="display:none;"></div>
 
 <div id="modalLicenca" class="modal">
   <div class="modal-content">
@@ -73,7 +78,7 @@
     <p>Insira sua chave FS-2026 para liberar relatórios e backups.</p>
     <input type="text" id="chaveLicenca" placeholder="FS-2026-XXXX-XXXX">
     <button class="btn-adicionar" onclick="ativarLicenca()">Validar Chave</button>
-    <button class="btn-link" onclick="fecharLicenca()">Voltar</button>
+    <button class="btn-link" onclick="fecharLicenca()" style="background:none; border:none; margin-top:10px; color:var(--text-sub); cursor:pointer;">Voltar</button>
   </div>
 </div>
 
@@ -81,9 +86,9 @@
     <div class="modal-content">
       <h2>Atenção</h2>
       <p>Deseja limpar todos os dados do dispositivo?</p>
-      <div class="confirm-btns">
-        <button id="btnConfirmarAcao" class="btn-danger-action">Sim, apagar</button>
-        <button onclick="fecharConfirmacao()" class="btn-link">Cancelar</button>
+      <div class="confirm-btns" style="display:flex; gap:10px; margin-top:20px">
+        <button id="btnConfirmarAcao" style="flex:1; padding:15px; border-radius:12px; border:none; background:var(--danger); color:white; font-weight:bold;">Sim, apagar</button>
+        <button onclick="fecharConfirmacao()" style="flex:1; padding:15px; border-radius:12px; border:none; background:var(--border); color:var(--text);">Cancelar</button>
       </div>
     </div>
 </div>
