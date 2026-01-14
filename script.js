@@ -53,7 +53,7 @@ function removerItem(id) {
     render();
 }
 
-// --- FUNÇÕES COM TRAVA PREMIUM ---
+// --- FUNÇÕES PREMIUM ---
 
 function exportarBackup() {
     if (localStorage.getItem(PREMIUM_KEY) !== "true") { abrirLicenca(); return; }
@@ -107,7 +107,7 @@ function gerarPDF() {
     tempCont.innerHTML = `
         <div style="padding:40px; font-family: sans-serif; color:#1e293b; background: white;">
             <div style="border-bottom:3px solid #0f172a; padding-bottom:20px; margin-bottom:30px; display:flex; justify-content:space-between;">
-                <div><h1 style="margin:0; font-size: 24px;">FASTSTILE PRO</h1><p>EXTRATO BANCÁRIO DE CONTROLE</p></div>
+                <div><h1 style="margin:0; font-size: 24px;">FASTSTILE PRO</h1><p>EXTRATO BANCÁRIO</p></div>
                 <div style="text-align:right;"><p><b>DATA:</b> ${new Date().toLocaleDateString('pt-BR')}</p></div>
             </div>
             <div style="display:flex; gap:10px; margin-bottom:30px;">
