@@ -53,7 +53,7 @@ function removerItem(id) {
     render();
 }
 
-// --- FUNÇÕES PREMIUM (BLOQUEADAS) ---
+// --- FUNÇÕES COM TRAVA PREMIUM ---
 
 function exportarBackup() {
     if (localStorage.getItem(PREMIUM_KEY) !== "true") { abrirLicenca(); return; }
@@ -65,11 +65,17 @@ function exportarBackup() {
     toast("Backup Exportado!");
 }
 
-function importarBackup(event) {
-    // Trava Premium no Restaurar
+function tentarImportar() {
     if (localStorage.getItem(PREMIUM_KEY) !== "true") { 
-        event.target.value = ""; // Limpa o input
         abrirLicenca(); 
+    } else {
+        document.getElementById('inputImport').click();
+    }
+}
+
+function importarBackup(event) {
+    if (localStorage.getItem(PREMIUM_KEY) !== "true") { 
+        event.target.value = ""; 
         return; 
     }
     const file = event.target.files[0];
@@ -129,6 +135,15 @@ function gerarPDF() {
     html2pdf().set(opt).from(tempCont).save().then(() => { tempCont.style.display = "none"; });
 }
 
+function abrirConfirmacao(tipo) {
+    if (localStorage.getItem(PREMIUM_KEY) !== "true") { abrirLicenca(); return; }
+    document.getElementById("modalConfirmacao").style.display = "flex";
+    document.getElementById("btnConfirmarAcao").onclick = () => { 
+        if(tipo==='limpar') { transacoes=[]; localStorage.setItem(DB_KEY,"[]"); render(); }
+        fecharConfirmacao(); 
+    };
+}
+
 // --- CORE ---
 function render() {
     const lista = document.getElementById("listaTransacoes");
@@ -144,7 +159,7 @@ function render() {
                 <div style="display:flex; gap:10px; align-items:center;">
                     <span style="font-weight:800; color:${t.tipo==='receita'?'var(--accent)':'var(--danger)'}">
                     ${t.tipo==='receita'?'+':'-'} ${t.valor.toLocaleString('pt-BR', {style:'currency', currency:'BRL'})}</span>
-                    <button onclick="removerItem(${t.id})" style="border:none; background:none; color:var(--text-sub);">✕</button>
+                    <button onclick="removerItem(${t.id})" style="border:none; background:none; color:var(--text-sub); cursor:pointer;">✕</button>
                 </div>
             </div>`;
         lista.appendChild(li);
@@ -187,18 +202,6 @@ async function fetchCambio() {
 
 function abrirLicenca() { document.getElementById("modalLicenca").style.display = "flex"; }
 function fecharLicenca() { document.getElementById("modalLicenca").style.display = "none"; }
-
-function abrirConfirmacao(tipo) {
-    // Trava Premium no Resetar (Limpar)
-    if (localStorage.getItem(PREMIUM_KEY) !== "true") { abrirLicenca(); return; }
-    
-    document.getElementById("modalConfirmacao").style.display = "flex";
-    document.getElementById("btnConfirmarAcao").onclick = () => { 
-        if(tipo==='limpar') { transacoes=[]; localStorage.setItem(DB_KEY,"[]"); render(); }
-        fecharConfirmacao(); 
-    };
-}
-
 function fecharConfirmacao() { document.getElementById("modalConfirmacao").style.display = "none"; }
 function toast(m) { const t = document.getElementById("toast"); t.innerText = m; t.style.display = "block"; setTimeout(()=>t.style.display="none", 3000); }
 
