@@ -1,0 +1,64 @@
+:root {
+  --primary: #0f172a;
+  --accent: #10b981;
+  --danger: #f43f5e;
+  --bg: #f8fafc;
+  --card: #ffffff;
+  --text: #0f172a;
+  --text-sub: #64748b;
+  --border: #e2e8f0;
+  --gold: #f59e0b;
+  --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+}
+
+body.dark-theme {
+  --bg: #020617; --card: #0f172a; --text: #f8fafc; --text-sub: #94a3b8; --border: #1e293b;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+body { background: var(--bg); color: var(--text); transition: 0.3s; padding-bottom: 20px; overflow-x: hidden; }
+
+.topo { background: linear-gradient(135deg, var(--primary) 0%, #1e293b 100%); color: white; padding: 40px 20px 100px; border-radius: 0 0 40px 40px; }
+.header-wrapper { max-width: 500px; margin: 0 auto; }
+.header-actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+
+.btn-icon { background: rgba(255,255,255,0.1); border: none; padding: 10px; border-radius: 14px; cursor: pointer; font-size: 20px; }
+.btn-premium-toggle { background: linear-gradient(90deg, var(--gold), #fbbf24); border: none; color: #000; padding: 8px 16px; border-radius: 50px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3); }
+
+.container { max-width: 500px; margin: -70px auto 0; padding: 0 20px; }
+.card { background: var(--card); border-radius: 28px; padding: 24px; margin-bottom: 20px; border: 1px solid var(--border); box-shadow: var(--shadow); }
+
+.dashboard { display: flex; align-items: center; gap: 20px; }
+.chart-container { position: relative; width: 110px; height: 110px; }
+.chart-center-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: 800; font-size: 18px; }
+
+.resumo-mini { flex: 1; }
+.item-resumo { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px; }
+.total-line { border-top: 1px solid var(--border); margin-top: 8px; padding-top: 8px; font-weight: 800; }
+
+.input-group { display: grid; grid-template-columns: 2fr 1fr; gap: 10px; margin-bottom: 12px; }
+input { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 15px; border-radius: 16px; width: 100%; outline: none; transition: 0.2s; }
+input:focus { border-color: var(--accent); }
+
+.botoes-tipo { display: flex; gap: 10px; margin-bottom: 15px; }
+.btn-tipo { flex: 1; padding: 14px; border-radius: 16px; border: 1px solid var(--border); background: var(--card); color: var(--text-sub); font-weight: 700; cursor: pointer; }
+.active-receita { background: var(--accent) !important; color: white !important; border-color: var(--accent) !important; }
+.active-despesa { background: var(--danger) !important; color: white !important; border-color: var(--danger) !important; }
+
+.btn-adicionar { width: 100%; padding: 18px; border-radius: 18px; border: none; background: var(--primary); color: white; font-weight: 800; cursor: pointer; }
+.btn-adicionar:hover { opacity: 0.9; }
+
+.modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; backdrop-filter: blur(5px); }
+.modal-content { background: var(--card); padding: 35px; border-radius: 32px; width: 100%; max-width: 380px; text-align: center; }
+.premium-icon { font-size: 50px; margin-bottom: 10px; display: block; }
+
+.footer-app { text-align: center; margin-top: 30px; font-size: 11px; opacity: 0.6; }
+.footer-app a { color: var(--accent); text-decoration: none; font-weight: 700; }
+
+.ferramentas-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+.tool-card { padding: 15px; border-radius: 20px; border: 1px solid var(--border); background: var(--card); color: var(--text); font-weight: 700; cursor: pointer; }
+.danger { color: var(--danger); }
+
+#toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #000; color: #fff; padding: 12px 25px; border-radius: 50px; display: none; z-index: 2000; font-size: 14px; }
+
+@media (max-width: 400px) { .input-group { grid-template-columns: 1fr; } }
