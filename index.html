@@ -6,25 +6,25 @@
   <title>FastStile Finance Pro</title>
   
   <meta name="author" content="C. Silva - FastStile">
-  <meta name="copyright" content="© 2026 FastStile - Todos os direitos reservados">
-  <meta name="description" content="Sistema Financeiro Profissional FastStile">
+  <meta name="copyright" content="© 2026 FastStile - Propriedade Intelectual Protegida">
   
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0f172a">
-  
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <link rel="stylesheet" href="style.css">
 </head>
-<body class="light-theme" oncontextmenu="return false;"> <header class="topo">
+<body class="light-theme" oncontextmenu="return false;">
+
+<header class="topo">
   <div class="header-wrapper">
     <div class="header-actions">
       <button class="btn-icon" onclick="toggleTheme()">🌓</button>
       <h2 class="brand-logo">FASTSTILE</h2>
       <button id="btnPremiumStatus" class="btn-premium-toggle" onclick="abrirLicenca()">🔓 Ativar PRO</button>
     </div>
-    <div id="miniConverter" class="cambio-tag">Aguardando...</div>
+    <div id="miniConverter" class="cambio-tag">Carregando...</div>
     <div class="saldo-principal">
       <p>Saldo Protegido</p>
       <h1 id="saldoTotal">R$ 0,00</h1>
@@ -41,39 +41,39 @@
           <div class="chart-center-text" id="saldoPercent">0%</div>
         </div>
         <div class="resumo-mini">
-          <div class="item-resumo"><span>Ganhos</span><strong id="totalRendas" class="txt-accent">R$ 0,00</strong></div>
-          <div class="item-resumo"><span>Gastos</span><strong id="totalDespesas" class="txt-danger">R$ 0,00</strong></div>
+          <div class="item-resumo"><span>Entradas</span><strong id="totalRendas" class="txt-accent">R$ 0,00</strong></div>
+          <div class="item-resumo"><span>Saídas</span><strong id="totalDespesas" class="txt-danger">R$ 0,00</strong></div>
           <div class="total-line"></div>
         </div>
       </div>
 
       <div class="card input-card">
-        <h3>Lançamento Inteligente</h3>
+        <h3>Novo Lançamento</h3>
         <div class="input-group">
-          <input type="text" id="descricao" placeholder="Descrição">
-          <input type="number" id="valor" placeholder="0,00">
+          <input type="text" id="descricao" placeholder="Ex: Mercado, Salário...">
+          <input type="number" id="valor" placeholder="0,00" step="0.01">
         </div>
         <div class="botoes-tipo">
           <button id="btnReceita" class="btn-tipo" onclick="setTipo('receita')">↑ Entrada</button>
           <button id="btnDespesa" class="btn-tipo" onclick="setTipo('despesa')">↓ Saída</button>
         </div>
-        <button class="btn-adicionar" onclick="salvarTransacao()">Registrar Transação</button>
+        <button class="btn-adicionar" onclick="salvarTransacao()">Confirmar Lançamento</button>
       </div>
 
       <div class="ferramentas-grid">
-        <button class="tool-card btn-pdf" onclick="gerarPDF()"><span>📄</span> Exportar PDF</button>
-        <button class="tool-card btn-backup" onclick="exportarBackup()"><span>📦</span> Backup</button>
-        <button class="tool-card btn-restore" onclick="tentarImportar()"><span>📥</span> Restaurar</button>
-        <button class="tool-card btn-danger-soft" onclick="abrirConfirmacao()"><span>🗑️</span> Limpar App</button>
-        <a href="privacy.html" class="tool-card btn-privacy">Termos de Uso e Licença</a>
+        <button class="tool-card btn-pdf" onclick="gerarPDF()">📄 Extrato</button>
+        <button class="tool-card btn-backup" onclick="exportarBackup()">📦 Backup</button>
+        <button class="tool-card btn-restore" onclick="tentarImportar()">📥 Restaurar</button>
+        <button class="tool-card btn-danger-soft" onclick="abrirConfirmacao()">🗑️ Limpar</button>
+        <a href="privacy.html" class="tool-card btn-privacy">Termos & Licença</a>
       </div>
     </div>
 
     <div class="column">
       <div class="card list-card">
-        <h3>Histórico de Atividades</h3>
+        <h3>Histórico Recente</h3>
         <ul id="listaTransacoes" class="lista-limpa"></ul>
-        <div class="footer-legal">© 2026 FastStile • Propriedade Intelectual Protegida</div>
+        <div class="footer-legal">© 2026 FastStile • Sistema Proprietário</div>
       </div>
     </div>
   </div>
@@ -81,32 +81,29 @@
 
 <div id="modalLicenca" class="modal">
   <div class="modal-content">
-    <div class="premium-badge">💎 SISTEMA PRO</div>
-    <h2>Autenticação de Licença</h2>
-    <p>A cópia não autorizada deste software é crime conforme Lei 9.609/98.</p>
+    <div class="premium-badge">💎 PRO</div>
+    <h2>Ativação de Licença</h2>
+    <p>O plágio deste software é crime conforme Lei 9.609/98.</p>
     <input type="text" id="chaveLicenca" placeholder="FS-2026-XXXX-XXXX" class="input-premium">
-    <button class="btn-adicionar" onclick="ativarLicenca()">Validar Propriedade</button>
-    <button class="btn-close" onclick="fecharLicenca()">Sair</button>
+    <button class="btn-adicionar" onclick="ativarLicenca()">Validar Chave</button>
+    <button class="btn-close" onclick="fecharLicenca()">Fechar</button>
   </div>
 </div>
 
 <div id="modalConfirmacao" class="modal">
     <div class="modal-content">
-      <h2>Zerar Base de Dados?</h2>
-      <p>Todos os registros locais serão removidos permanentemente.</p>
+      <h2>Zerar Sistema?</h2>
+      <p>Isso apagará todas as transações deste dispositivo.</p>
       <div class="modal-btns">
-        <button id="btnConfirmarAcao" class="btn-danger">Apagar Tudo</button>
-        <button onclick="fecharConfirmacao()" class="btn-gray">Manter Dados</button>
+        <button id="btnConfirmarAcao" class="btn-danger">Sim, apagar</button>
+        <button onclick="fecharConfirmacao()" class="btn-gray">Cancelar</button>
       </div>
     </div>
 </div>
 
 <div id="toast"></div>
-<input type="file" id="inputImport" style="display:none" accept=".faststile" onchange="importarBackup(event)">
-
-<div id="pdf-wrapper" style="opacity:0; pointer-events:none; position:absolute; top:0; left:0; width:210mm; z-index:-1;">
-    <div id="pdf-template"></div>
-</div>
+<input type="file" id="inputImport" style="display:none" onchange="importarBackup(event)">
+<div id="pdf-wrapper" style="opacity:0; position:absolute; z-index:-1;"><div id="pdf-template"></div></div>
 
 <script src="script.js"></script>
 </body>
