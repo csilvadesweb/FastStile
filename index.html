@@ -56,7 +56,7 @@
       <div class="card input-card">
         <h3>Novo Lançamento</h3>
         <div class="input-group">
-          <input type="text" id="descricao" placeholder="Descrição">
+          <input type="text" id="descricao" placeholder="Descrição (ex: Aluguel)">
           <input type="number" id="valor" placeholder="0,00" step="0.01">
         </div>
         <div class="botoes-tipo">
@@ -87,20 +87,20 @@
 <div id="modalLicenca" class="modal">
   <div class="modal-content">
     <div class="premium-badge">💎 PRO</div>
-    <h2>Desbloqueie o Poder Total</h2>
-    <p>Ative backups criptografados e relatórios PDF profissionais.</p>
+    <h2>Ativar Versão Profissional</h2>
+    <p>Insira sua chave para liberar Backups e Exportação de PDF.</p>
     <input type="text" id="chaveLicenca" placeholder="FS-2026-XXXX-XXXX" class="input-premium">
-    <button class="btn-adicionar" onclick="ativarLicenca()">Validar Licença</button>
-    <button class="btn-close" onclick="fecharLicenca()">Agora não</button>
+    <button class="btn-adicionar" onclick="ativarLicenca()">Validar Chave</button>
+    <button class="btn-close" onclick="fecharLicenca()">Voltar</button>
   </div>
 </div>
 
 <div id="modalConfirmacao" class="modal">
     <div class="modal-content">
-      <h2>Apagar tudo?</h2>
-      <p>Esta ação é irreversível e removerá todos os dados locais.</p>
+      <h2>Apagar Dados?</h2>
+      <p>Isso removerá permanentemente todas as suas transações deste aparelho.</p>
       <div class="modal-btns">
-        <button id="btnConfirmarAcao" class="btn-danger">Sim, apagar</button>
+        <button id="btnConfirmarAcao" class="btn-danger">Sim, apagar tudo</button>
         <button onclick="fecharConfirmacao()" class="btn-gray">Cancelar</button>
       </div>
     </div>
@@ -109,7 +109,7 @@
 <div id="toast"></div>
 <input type="file" id="inputImport" style="display:none" accept=".faststile" onchange="importarBackup(event)">
 
-<div id="pdf-wrapper" style="opacity: 0; pointer-events: none; position: absolute; top: 0; left: 0; width: 210mm; z-index: -1;">
+<div id="pdf-wrapper" style="opacity:0; pointer-events:none; position:absolute; top:0; left:0; width:210mm; z-index:-1;">
     <div id="pdf-template"></div>
 </div>
 
