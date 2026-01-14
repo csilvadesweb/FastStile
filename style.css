@@ -12,7 +12,7 @@ body { background: var(--bg); color: var(--text); transition: 0.3s; padding-bott
 .topo { background: linear-gradient(135deg, var(--primary) 0%, #1e293b 100%); color: white; padding: 60px 20px 100px; border-radius: 0 0 40px 40px; }
 .header-wrapper { max-width: 500px; margin: 0 auto; }
 .header-actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-.btn-icon { background: rgba(255,255,255,0.1); border: none; padding: 12px; border-radius: 14px; cursor: pointer; }
+.btn-icon { background: rgba(255,255,255,0.1); border: none; padding: 12px; border-radius: 14px; cursor: pointer; font-size: 20px; }
 .btn-premium-toggle { background: var(--gold); border: none; padding: 8px 18px; border-radius: 50px; font-weight: 700; cursor: pointer; }
 
 .container { max-width: 500px; margin: -70px auto 0; padding: 0 20px; }
@@ -36,13 +36,15 @@ input { background: var(--bg); border: 1px solid var(--border); color: var(--tex
 
 .btn-adicionar { width: 100%; padding: 18px; border-radius: 18px; border: none; background: var(--primary); color: white; font-weight: 800; cursor: pointer; }
 
-/* Grid de Ferramentas */
+/* Grid de Ferramentas Colorido */
 .ferramentas-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.tool-card { padding: 15px; border-radius: 20px; border: none; color: white; font-weight: 700; font-size: 12px; cursor: pointer; }
+.tool-card { padding: 15px; border-radius: 20px; border: none; color: white; font-weight: 700; font-size: 12px; cursor: pointer; transition: transform 0.1s; text-align: center; }
+.tool-card:active { transform: scale(0.95); }
 .btn-pdf { background: var(--blue); }
 .btn-backup { background: var(--accent); }
 .btn-restore { background: var(--primary); }
 .tool-card.danger { background: #fee2e2; color: var(--danger); border: 1px solid #fecaca; }
+.btn-privacy { background: var(--border); color: var(--text-sub) !important; font-size: 11px; font-weight: 600; }
 
 .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; backdrop-filter: blur(5px); }
 .modal-content { background: var(--card); padding: 35px; border-radius: 32px; width: 100%; max-width: 380px; text-align: center; }
