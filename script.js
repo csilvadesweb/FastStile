@@ -1,63 +1,145 @@
 "use strict";
 
-const DB_KEY="FastStile_DB";
-const PREMIUM_KEY="FastStile_Premium";
-let transacoes=JSON.parse(localStorage.getItem(DB_KEY))||[];
-let tipoSelecionado=null;
+document.addEventListener("DOMContentLoaded", () => {
 
-const isPremium=()=>localStorage.getItem(PREMIUM_KEY)==="true";
-const toast=m=>{const t=document.getElementById("toast");t.innerText=m;t.style.display="block";setTimeout(()=>t.style.display="none",3000)};
+  /* ===============================
+     CONFIGURAÇÃO CENTRAL
+  =============================== */
+  const STORAGE_KEY = "faststile_data_v1";
+  const PREMIUM_KEY = "faststile_premium";
 
-function setTipo(t){tipoSelecionado=t}
-function salvarTransacao(){
-  if(!tipoSelecionado)return toast("Selecione tipo");
-  const d=descricao.value,v=parseFloat(valor.value);
-  if(!d||!v)return toast("Campos inválidos");
-  transacoes.unshift({id:Date.now(),desc:d,valor:v,tipo:tipoSelecionado,data:new Date().toLocaleDateString()});
-  localStorage.setItem(DB_KEY,JSON.stringify(transacoes));
-  render();
-}
-function render(){
-  listaTransacoes.innerHTML="";
-  transacoes.forEach(t=>{
-    const li=document.createElement("li");
-    li.innerHTML=`${t.data} - ${t.desc} - ${t.valor.toFixed(2)}`;
-    listaTransacoes.appendChild(li);
-  });
-}
+  /* ===============================
+     ESTADO DO APP
+  =============================== */
+  let transacoes = [];
+  let tipoSelecionado = null;
 
-function gerarPDF(){
-  if(!isPremium())return abrirLicenca();
-  html2pdf().from(document.body).save("extrato.pdf");
-}
+  /* ===============================
+     ELEMENTOS (SAFE)
+  =============================== */
+  const el = (id) => document.getElementById(id);
 
-async function exportarBackup(){
-  if(!isPremium())return abrirLicenca();
-  const blob=new Blob([JSON.stringify(transacoes)],{type:"application/json"});
-  const a=document.createElement("a");
-  a.href=URL.createObjectURL(blob);
-  a.download="backup.fsbackup";
-  a.click();
-}
+  const descricaoInput = el("descricao");
+  const valorInput = el("valor");
+  const listaTransacoes = el("listaTransacoes");
+  const saldoPercent = el("saldoPercent");
 
-function importarBackup(){
-  if(!isPremium())return abrirLicenca();
-  backupFileInput.click();
-}
+  /* ===============================
+     UTILIDADES
+  =============================== */
+  const isPremium = () => localStorage.getItem(PREMIUM_KEY) === "true";
 
-backupFileInput.onchange=async e=>{
-  const file=e.target.files[0];
-  transacoes=JSON.parse(await file.text());
-  localStorage.setItem(DB_KEY,JSON.stringify(transacoes));
-  render();
-};
+  const toast = (msg) => {
+    const t = el("toast");
+    if (!t) return alert(msg);
+    t.textContent = msg;
+    t.style.display = "block";
+    setTimeout(() => (t.style.display = "none"), 3000);
+  };
 
-function ativarLicenca(){
-  localStorage.setItem(PREMIUM_KEY,"true");
-  location.reload();
-}
+  /* ===============================
+     STORAGE
+  =============================== */
+  const carregarDados = () => {
+    try {
+      transacoes = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+    } catch {
+      transacoes = [];
+    }
+  };
 
-function abrirLicenca(){modalLicenca.style.display="flex"}
-function resetar(){localStorage.clear();location.reload()}
+  const salvarDados = () => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(transacoes));
+  };
 
-render();
+  /* ===============================
+     LÓGICA DE NEGÓCIO
+  =============================== */
+  window.setTipo = (tipo) => {
+    tipoSelecionado = tipo;
+  };
+
+  window.salvarTransacao = () => {
+    if (!descricaoInput || !valorInput) return;
+
+    const descricao = descricaoInput.value.trim();
+    const valor = parseFloat(valorInput.value);
+
+    if (!descricao || isNaN(valor) || !tipoSelecionado) {
+      toast("Preencha todos os campos");
+      return;
+    }
+
+    transacoes.unshift({
+      id: Date.now(),
+      descricao,
+      valor,
+      tipo: tipoSelecionado,
+      data: new Date().toLocaleDateString("pt-BR"),
+    });
+
+    salvarDados();
+    descricaoInput.value = "";
+    valorInput.value = "";
+    tipoSelecionado = null;
+    renderizar();
+  };
+
+  /* ===============================
+     RENDER
+  =============================== */
+  const renderizar = () => {
+    if (!listaTransacoes) return;
+
+    listaTransacoes.innerHTML = "";
+
+    let totalReceita = 0;
+    let totalDespesa = 0;
+
+    transacoes.forEach((t) => {
+      const li = document.createElement("li");
+      li.textContent = `${t.data} • ${t.descricao} • R$ ${t.valor.toFixed(2)}`;
+      listaTransacoes.appendChild(li);
+
+      t.tipo === "receita"
+        ? (totalReceita += t.valor)
+        : (totalDespesa += t.valor);
+    });
+
+    const total = totalReceita + totalDespesa;
+    const percentual =
+      total > 0 ? Math.round((totalReceita / total) * 100) : 0;
+
+    if (saldoPercent) saldoPercent.textContent = `${percentual}%`;
+  };
+
+  /* ===============================
+     PREMIUM (BÁSICO)
+  =============================== */
+  window.ativarLicenca = () => {
+    localStorage.setItem(PREMIUM_KEY, "true");
+    toast("Premium ativado");
+    setTimeout(() => location.reload(), 800);
+  };
+
+  window.abrirLicenca = () => {
+    const modal = el("modalLicenca");
+    if (modal) modal.style.display = "flex";
+  };
+
+  /* ===============================
+     RESET
+  =============================== */
+  window.resetar = () => {
+    if (confirm("Deseja apagar todos os dados?")) {
+      localStorage.clear();
+      location.reload();
+    }
+  };
+
+  /* ===============================
+     INIT
+  =============================== */
+  carregarDados();
+  renderizar();
+});
