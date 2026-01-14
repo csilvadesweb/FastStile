@@ -3,70 +3,88 @@
 document.addEventListener("DOMContentLoaded", () => {
 
   /* ===============================
-     CONFIGURAÇÃO CENTRAL
+     CONFIG
   =============================== */
   const STORAGE_KEY = "faststile_data_v1";
   const PREMIUM_KEY = "faststile_premium";
 
-  /* ===============================
-     ESTADO DO APP
-  =============================== */
   let transacoes = [];
   let tipoSelecionado = null;
 
   /* ===============================
-     ELEMENTOS (SAFE)
+     ELEMENTOS
   =============================== */
-  const el = (id) => document.getElementById(id);
+  const $ = (id) => document.getElementById(id);
 
-  const descricaoInput = el("descricao");
-  const valorInput = el("valor");
-  const listaTransacoes = el("listaTransacoes");
-  const saldoPercent = el("saldoPercent");
+  const descricaoInput = $("descricao");
+  const valorInput = $("valor");
+  const listaTransacoes = $("listaTransacoes");
+  const saldoPercent = $("saldoPercent");
+
+  const btnReceita = document.querySelector("button[onclick*='Receita'], button:contains('Receita')");
+  const btnDespesa = document.querySelector("button[onclick*='Despesa'], button:contains('Despesa')");
+  const btnConfirmar = document.querySelector(".btn-adicionar") || document.querySelector("button");
 
   /* ===============================
-     UTILIDADES
+     UTIL
   =============================== */
-  const isPremium = () => localStorage.getItem(PREMIUM_KEY) === "true";
-
   const toast = (msg) => {
-    const t = el("toast");
+    const t = $("toast");
     if (!t) return alert(msg);
     t.textContent = msg;
     t.style.display = "block";
-    setTimeout(() => (t.style.display = "none"), 3000);
+    setTimeout(() => (t.style.display = "none"), 2500);
   };
 
   /* ===============================
      STORAGE
   =============================== */
-  const carregarDados = () => {
+  function carregar() {
     try {
       transacoes = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
     } catch {
       transacoes = [];
     }
-  };
+  }
 
-  const salvarDados = () => {
+  function salvar() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(transacoes));
-  };
+  }
 
   /* ===============================
-     LÓGICA DE NEGÓCIO
+     EVENTOS
   =============================== */
-  window.setTipo = (tipo) => {
-    tipoSelecionado = tipo;
-  };
+  document.querySelectorAll("button").forEach(btn => {
+    if (btn.textContent.includes("Receita")) {
+      btn.addEventListener("click", () => {
+        tipoSelecionado = "receita";
+        toast("Receita selecionada");
+      });
+    }
 
-  window.salvarTransacao = () => {
+    if (btn.textContent.includes("Despesa")) {
+      btn.addEventListener("click", () => {
+        tipoSelecionado = "despesa";
+        toast("Despesa selecionada");
+      });
+    }
+
+    if (btn.textContent.includes("Confirmar")) {
+      btn.addEventListener("click", salvarTransacao);
+    }
+  });
+
+  /* ===============================
+     LÓGICA
+  =============================== */
+  function salvarTransacao() {
     if (!descricaoInput || !valorInput) return;
 
     const descricao = descricaoInput.value.trim();
-    const valor = parseFloat(valorInput.value);
+    const valor = parseFloat(valorInput.value.replace(",", "."));
 
     if (!descricao || isNaN(valor) || !tipoSelecionado) {
-      toast("Preencha todos os campos");
+      toast("Preencha descrição, valor e tipo");
       return;
     }
 
@@ -75,71 +93,44 @@ document.addEventListener("DOMContentLoaded", () => {
       descricao,
       valor,
       tipo: tipoSelecionado,
-      data: new Date().toLocaleDateString("pt-BR"),
+      data: new Date().toLocaleDateString("pt-BR")
     });
 
-    salvarDados();
+    salvar();
     descricaoInput.value = "";
     valorInput.value = "";
     tipoSelecionado = null;
-    renderizar();
-  };
+    render();
+  }
 
   /* ===============================
      RENDER
   =============================== */
-  const renderizar = () => {
+  function render() {
     if (!listaTransacoes) return;
 
     listaTransacoes.innerHTML = "";
+    let receita = 0;
+    let despesa = 0;
 
-    let totalReceita = 0;
-    let totalDespesa = 0;
-
-    transacoes.forEach((t) => {
+    transacoes.forEach(t => {
       const li = document.createElement("li");
       li.textContent = `${t.data} • ${t.descricao} • R$ ${t.valor.toFixed(2)}`;
       listaTransacoes.appendChild(li);
 
-      t.tipo === "receita"
-        ? (totalReceita += t.valor)
-        : (totalDespesa += t.valor);
+      t.tipo === "receita" ? receita += t.valor : despesa += t.valor;
     });
 
-    const total = totalReceita + totalDespesa;
-    const percentual =
-      total > 0 ? Math.round((totalReceita / total) * 100) : 0;
+    const total = receita + despesa;
+    const percent = total ? Math.round((receita / total) * 100) : 0;
 
-    if (saldoPercent) saldoPercent.textContent = `${percentual}%`;
-  };
-
-  /* ===============================
-     PREMIUM (BÁSICO)
-  =============================== */
-  window.ativarLicenca = () => {
-    localStorage.setItem(PREMIUM_KEY, "true");
-    toast("Premium ativado");
-    setTimeout(() => location.reload(), 800);
-  };
-
-  window.abrirLicenca = () => {
-    const modal = el("modalLicenca");
-    if (modal) modal.style.display = "flex";
-  };
-
-  /* ===============================
-     RESET
-  =============================== */
-  window.resetar = () => {
-    if (confirm("Deseja apagar todos os dados?")) {
-      localStorage.clear();
-      location.reload();
-    }
-  };
+    if (saldoPercent) saldoPercent.textContent = `${percent}%`;
+  }
 
   /* ===============================
      INIT
   =============================== */
-  carregarDados();
-  renderizar();
+  carregar();
+  render();
+
 });
