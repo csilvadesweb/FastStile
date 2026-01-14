@@ -53,7 +53,8 @@ function removerItem(id) {
     render();
 }
 
-// --- FUNÇÕES PREMIUM ---
+// --- FUNÇÕES PREMIUM (BLOQUEADAS) ---
+
 function exportarBackup() {
     if (localStorage.getItem(PREMIUM_KEY) !== "true") { abrirLicenca(); return; }
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(transacoes));
@@ -65,7 +66,12 @@ function exportarBackup() {
 }
 
 function importarBackup(event) {
-    if (localStorage.getItem(PREMIUM_KEY) !== "true") { abrirLicenca(); return; }
+    // Trava Premium no Restaurar
+    if (localStorage.getItem(PREMIUM_KEY) !== "true") { 
+        event.target.value = ""; // Limpa o input
+        abrirLicenca(); 
+        return; 
+    }
     const file = event.target.files[0];
     if (!file) return;
     const reader = new FileReader();
@@ -126,6 +132,7 @@ function gerarPDF() {
 // --- CORE ---
 function render() {
     const lista = document.getElementById("listaTransacoes");
+    if (!lista) return;
     lista.innerHTML = "";
     let r = 0, d = 0;
     transacoes.forEach(t => {
@@ -150,7 +157,9 @@ function render() {
 }
 
 function atualizarGrafico(r, d) {
-    const ctx = document.getElementById('graficoFinanceiro').getContext('2d');
+    const canvas = document.getElementById('graficoFinanceiro');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
     if (meuGrafico) meuGrafico.destroy();
     meuGrafico = new Chart(ctx, {
         type: 'doughnut',
@@ -178,18 +187,27 @@ async function fetchCambio() {
 
 function abrirLicenca() { document.getElementById("modalLicenca").style.display = "flex"; }
 function fecharLicenca() { document.getElementById("modalLicenca").style.display = "none"; }
+
 function abrirConfirmacao(tipo) {
+    // Trava Premium no Resetar (Limpar)
+    if (localStorage.getItem(PREMIUM_KEY) !== "true") { abrirLicenca(); return; }
+    
     document.getElementById("modalConfirmacao").style.display = "flex";
     document.getElementById("btnConfirmarAcao").onclick = () => { 
         if(tipo==='limpar') { transacoes=[]; localStorage.setItem(DB_KEY,"[]"); render(); }
         fecharConfirmacao(); 
     };
 }
+
 function fecharConfirmacao() { document.getElementById("modalConfirmacao").style.display = "none"; }
 function toast(m) { const t = document.getElementById("toast"); t.innerText = m; t.style.display = "block"; setTimeout(()=>t.style.display="none", 3000); }
+
 function validarPremiumUI() { 
     if(localStorage.getItem(PREMIUM_KEY) === "true") { 
-        document.getElementById("btnPremiumStatus").innerText = "💎 Plano PRO";
-        document.getElementById("btnPremiumStatus").style.background = "#1e293b";
+        const btn = document.getElementById("btnPremiumStatus");
+        if(btn) {
+            btn.innerText = "💎 Plano PRO";
+            btn.style.background = "#1e293b";
+        }
     } 
 }
